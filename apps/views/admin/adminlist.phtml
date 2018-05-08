@@ -1,0 +1,27 @@
+
+<div>
+</div>
+<div class="pd2 cf">
+    <h4 class="fl">管理员列表</h4>
+</div>
+<table class="table table-bordered text-center table-hover">
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>用户名</th>
+        <th>状态</th>
+        <th>备注</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($page->items as $item): ?>
+        <tr>
+            <td><?= $item->id;?></td>
+            <td><?= $item->username;?></td>
+            <td><?= $item->status == '1'?'正常':'冻结';?></td>
+            <td><?= $item->beizhu;?></td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+<?php $this->partial("common/pages", array('url' => 'admin/adminlist?page=', 'page' => $page)) ?>

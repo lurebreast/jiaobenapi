@@ -1,0 +1,47 @@
+<?php
+$geturl = $this->dispatcher->getControllerName() . '/' . $this->dispatcher->getActionName();
+$namespace = $this->dispatcher->getNamespaceName();
+$namespace = strtolower($namespace);
+$controller = $this->dispatcher->getControllerName();
+$action = $this->dispatcher->getActionName();
+?>
+<header class="main-header">
+    <div class="main-logo w100">
+        <a class="navbar-brand" href="#">米多管理后台</a>
+        <!-- <a href="#" class="" data-toggle="dropdown">用户管理<b class="caret"></b></a>-->
+        <a class="dropdown-toggle fr" href="<?= $this->url->get('auth/logout') ?>">退出后台</a>
+    </div>
+    <div class="main-nav navbar-blue">
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-default navbar-static-top cf" role="navigation">
+            <ul class="nav navbar-nav">
+
+            </ul>
+        </nav>
+    </div>
+</header>
+<ul class="main-sidebar hidden-xs fixed">
+    <li <?php if($controller=='typedata'):?>class="on"<?php endif;?>>
+        <h5>数据管理</h5>
+        <p <?php if($controller=='typedata'&&$action=='index'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/index') ?>">数据列表</a></p>
+        <p <?php if($controller=='typedata'&&$action=='dataadd'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/dataadd') ?>">上传数据</a></p>
+        <p <?php if($controller=='typedata'&&$action=='api'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/api') ?>">接口说明</a></p>
+        <p <?php if($controller=='typedata'&&$action=='typead'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/typead') ?>">项目管理</a></p>
+
+    </li>
+    <li <?php if($controller=='admin'):?>class="on"<?php endif;?>>
+        <h5>用户管理</h5>
+        <p <?php if($controller=='admin'&&$action=='addadmin'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('admin/addadmin') ?>">添加管理员</a></p>
+
+    </li>
+    <footer class="main-footer text-center fixed">
+        Copyright © 2014-2017 <br>版权所有米多科技
+    </footer>
+</ul>
+<script type="text/javascript">
+    $('.main-sidebar li').on('click',function(){
+        var $obj = $(this);
+        $obj.addClass('on').siblings().removeClass('on');
+        //$obj.children('p').show().parent().siblings().children('p').hide();
+    })
+</script>

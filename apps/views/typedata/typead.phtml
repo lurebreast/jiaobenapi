@@ -1,0 +1,56 @@
+<script>
+
+    $(document).on('click', '.delete', function(data) {
+        $self = $(this);
+        var r=confirm($self.attr('data-title'));
+        if (r==true)
+        {
+            window.location=$self.attr('data-url');
+        }
+        return ;
+    });
+    function edittype(id)
+    {
+        htmlobj1 = $.ajax({url: "<?= $this->url->get('typedata/edittype?typeid=') ?>" + id , async: false});
+        $("#mymodel").html(htmlobj1.responseText);
+    }
+</script>
+<div class="pd2 cf">
+    <h4 class="fl">项目管理</h4>
+
+</div>
+
+<table class="table table-bordered text-center table-hover">
+    <thead>
+    <tr>
+        <th>项目id</th>
+        <th>项目名称</th>
+        <th >操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($type as $item): ?>
+        <tr>
+            <td><?= $item->typeid;?></td>
+            <td><?= $item->typename;?></td>
+            <td><a data-url="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" data-title="删除项目" class="btn btn-sm btn-danger delete">删除</a>
+                <a data-url="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" data-title="清空数据"  class="btn btn-sm btn-danger delete">清除数据</a>
+                <a  onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" href="" title="修改" class="btn btn-sm btn-success">修改</a>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">修改信息</h4>
+            </div>
+            <div id="mymodel" class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>

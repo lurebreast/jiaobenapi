@@ -1,0 +1,354 @@
+/* 通用样式 */
+html,
+body {
+    height: 100%;
+}
+body{padding-top:110px;}
+body, div, p, ul, li, ol, dl, dd, form, h1, h2, h3, h4{
+	font-family: "Microsoft YaHei";
+	font-weight:normal;
+}
+/* body:after{
+	content:'';
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index:-1;
+	width: 100%;
+	height:100%;
+	background:url(bg.jpg) center center no-repeat;
+	background-size:100%;
+	-webkit-filter: blur(1px);
+} */
+img {
+    border: none;
+}
+.main-sidebar li p{
+    display:none;
+}
+.main-sidebar li.on p,.main-sidebar li.on p.active{
+    display: block;
+}
+ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* a {
+    text-decoration: none;
+} */
+
+.fl,.file-input{
+    float: left;
+}
+
+.fr,.nav-tabs>li.fr{
+    float: right;
+}
+.pd2{
+	padding:0 2%;
+}
+.pt2{padding-top:2%;}
+.pdl20{
+    padding-left:20%;
+}
+.pb2{padding-bottom:2%;}
+.table th{
+	text-align: center;
+}
+.cf:before,
+.cf:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+.cf {
+    *zoom: 1;
+}
+.text-right{text-align:right;}
+.w100,.main-sidebar li,.carousel-table>tbody>tr>td img,.main-header,.btn-file input,.imgList img{
+    width: 100%;
+}
+.table>tbody>tr>td img{
+    width:85px;
+}
+.login-form,.login-box-msg,.w50{
+    width: 50%;
+}
+.w50rem{width:50rem;}
+.mt0{margin-top: 0}
+.fixed,.main-header{
+    position: fixed;
+}
+.navbar-brand,.main-sidebar li p a:hover,.main-sidebar li h5,.main-sidebar li p.active a,
+.navbar-default .navbar-nav>li>a
+{
+    color:#fff;
+}
+.navbar-default .navbar-nav>li>a:hover{
+    background-color: #fff;
+    color: #336699;
+}
+/* 冲突框架样式 */
+.table{
+	table-layout:fixed;
+}
+.table>tbody>tr>td, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+	vertical-align: middle;
+	line-height:1.8;
+	font-weight:normal;
+	border-color:transparent;
+	border-bottom-color:#888;
+	word-wrap:break-word;
+}
+.dropdown-menu{
+	left: -59px;
+}
+.table-bordered{
+	border-color:#888;
+}
+.nav-tabs-indexgame > li > a:visited{
+    color: #555;
+    cursor: default;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+}
+.nav-tabs-indexgame > li > a{
+    font-size:18px;
+}
+
+/* 登录样式(auth/index) */
+.login-form,
+.login-box-msg {
+    
+    margin: 1% auto;
+}
+
+.login-form button {
+    margin-bottom: 5%;
+}
+
+.login-logo {
+    margin-top: 15%;
+    margin-bottom: 3%;
+}
+/* 添加游戏样式(game/gameadd) */
+.gameadd-form{margin-bottom:2%;}
+.gameadd-form label{
+    font-weight:normal;
+}
+.showimg,.btn-file input,.imgList{display:inline-block;}
+.btn-file,.imgList{position: relative;}
+.imgList span,.btn-file input{position: absolute;}
+.btn-file input{
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+.imgList {
+    width: 100px;
+    margin: 0 .35rem;
+    overflow: hidden;
+}
+.imgList span{
+    background-color:rgba(255,255,255,.8);
+    color: #666;
+    top: 0;
+    right: 0;
+    text-align: right;
+}
+/* 顶部导航样式 */
+.main-header{
+    height: 51px;
+    top: 0;
+    z-index:100;
+}
+.main-logo{
+    position: absolute;
+    top: 0;
+}
+.main-header{
+    height:55px;
+    padding-top:55px;
+    background: url('//admin.miduo.com/bestadmin/images/top_bg_hr.jpg') left top no-repeat;
+    background-size:cover;
+}
+
+.navbar-blue nav{background-color: #336699;width:1000px;margin:auto;}
+.dropdown-toggle{margin:20px 10px;}
+/*.navbar-blue{
+    background-color:#336699;
+}
+ 首页样式+侧栏导航(appindex/indexgame、common/nav) */
+.main-footer{
+	bottom: 15px;
+    left: 0;
+}
+.main-sidebar,.main-footer{
+	width: 200px;
+}
+
+.main-sidebar {
+    top: 106px;
+    left: 0;
+    height: 100%;
+    padding-top:1%;
+    /*padding:1% 5% 0 2%;*/
+    box-shadow: 5px 0 6px #ccc;
+}
+/* .main-container,.wrapper{
+    margin-top:3%;
+} */
+.main-sidebar,.main-container{
+    background: rgba(255,255,255,.8);
+}
+.main-sidebar li{
+    border-bottom:1px solid #fff;
+}
+.main-sidebar li:before{
+    float:right;
+    margin-top:1.2rem;
+    margin-right:1rem;
+    content: "\e114";
+    font-family: 'Glyphicons Halflings';
+    line-height: 1;
+    color:#fff;
+}
+.main-sidebar li.on:before{
+    content: "\e113";
+}
+.main-sidebar li h5{
+	font-size:1.75rem;
+	padding:1rem;
+	margin-top: 0;
+}
+.main-sidebar li p,.table{
+	/* font-size:1.55rem; */
+}
+.main-sidebar li p,.main-sidebar li h5{
+	margin-bottom: 0;
+}
+.main-sidebar li p a{
+    display: block;
+    text-decoration: none;
+	padding: .8rem 5% .8rem 1rem;
+}
+.main-sidebar li p a:hover,.main-sidebar li p.active a{
+    background-color:#5d9ad8;
+}
+.navbar-default{border-color:transparent;}
+.main-sidebar li h5,.navbar-blue,.main-header{
+	background-color:#336699;
+}
+/* 上传安装包样式 */
+#file-list{padding:.6rem 0;}
+.pt7{padding-top:7px;}
+
+/* 游戏列表 */
+.file-input{
+    width: 20%;
+}
+.file-preview-frame:not(.file-preview-error):hover{
+    box-shadow:0 0 0 0 transparent!important;
+}
+/* 平台币操作 */
+.p-error::-webkit-input-placeholder{
+    color: #dd524d;
+}
+.wallet-money-form{
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* 节点列表 */
+.node-list{
+    padding:20px;
+}
+.node-list h4{
+    font-size:16px;
+}
+.node-list h4 i {
+    margin-right: 8px;
+    color: #337ab7;
+}
+
+.node-sidebar,
+.node-sidebar ul {
+    margin-left: 20px;
+}
+
+.node-sidebar ul li {
+    padding: 2px 0;
+}
+
+.node-table {
+    width: 80%;
+    padding: 20px;
+}
+
+.node-table img.ok {
+    width: 15px;
+}
+
+.green-color {
+    color: #8de216;
+}
+/* 查看权限 */
+.line2 {
+    line-height: 2.5;
+}
+
+.power-check {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+
+.power-check input {
+    cursor: pointer;
+    position: absolute;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 30px;
+    z-index: 10;
+}
+
+.power-check input:focus {
+    outline: 0;
+}
+
+.power-check input:checked+label {
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}
+
+.power-mod {
+    border: 1px solid #ccc;
+    padding: 2px 5px;
+    margin-bottom: 5px;
+}
+.power-form {
+    width: 1100px;
+    margin: auto;
+}
+
+.power-form>ul {
+    padding: 10px 0;
+}
+
+.power-form button[type='submit'] {
+    margin-left: 15px;
+}
+
+.mr4 {
+    margin-right: 4px;
+}

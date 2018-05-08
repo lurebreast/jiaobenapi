@@ -1,0 +1,20 @@
+<link href="/css/fileinput.css" media="all" rel="stylesheet" type="text/css" />
+<script src="/js/fileinput.js" type="text/javascript"></script>
+<div class="pd2 cf">
+    <h4 class="fl">上传数据</h4>
+
+</div>
+<form class="navbar-form navbar-left" action="<?= $this->url->get('typedata/dataadd') ?>" method="post" role="form" enctype="multipart/form-data">
+    <input type="hidden" name="<?= $this->security->getTokenKey() ?>" value="<?= $this->security->getToken() ?>"/>
+    <div class="form-group mt0 "> 项目:
+        <select class="form-control" id="typeid" name="typeid"  >
+            <option  value="">请选择</option>
+            <?php foreach ($type as $ptype): ?>
+                <option  value='<?= $ptype->typeid;?>' <?php if ($search['typeid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
+            <?php endforeach; ?>
+        </select>
+        上传txt文件：<input name="name" type="file" id="av" style="display: inline-block" />
+        <button type="submit" class="btn btn-flat btn-success">上传</button>
+    </div>
+
+</form>

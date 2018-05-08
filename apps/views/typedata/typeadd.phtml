@@ -1,0 +1,11 @@
+<form class="form-horizontal" role="form" method="post" action="<?= $this->url->get('typedata/typeadd') ?>">
+    <input type="hidden" name="<?= $this->security->getTokenKey() ?>" value="<?= $this->security->getToken() ?>"/>
+    <div class="form-group">
+        <label class="col-xs-2 control-label">项目名称：</label>
+        <div class="col-xs-10">
+            <input type="text" name="typename" placeholder="项目名称" class="form-control" required=""  value="">
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-flat btn-info btn-lg btn-block">提交</button>
+</form>

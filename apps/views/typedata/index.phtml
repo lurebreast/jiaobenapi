@@ -1,0 +1,91 @@
+<?php
+
+$params = $_GET;
+?>
+<script>
+    function addtype()
+    {
+        htmlobj1 = $.ajax({url: "<?= $this->url->get('typedata/typeadd') ?>", async: false});
+        $("#mymodel").html(htmlobj1.responseText);
+    }
+
+    $(document).on('click', '.delete', function(data) {
+        $self = $(this);
+        var r=confirm('删除项目');
+        if (r==true)
+        {
+            window.location=$self.attr('data-url');
+        }
+        return ;
+    });
+</script>
+<script src="/js/dp/WdatePicker.js" type="text/javascript"></script>
+<div class="pd2 cf">
+    <h4 class="fl">数据列表</h4>
+    <h4 class="fr"><a  onclick="addtype()"  data-toggle="modal" data-target="#myModal" id="data" href="" title="添加项目" class="btn btn-sm btn-success">添加项目</a></h4>
+    <h4 class="fr"><a   href="<?= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['tid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime']) ?>" title="导出" class="btn btn-sm btn-success">导出</a></h4>
+
+</div>
+<form class="navbar-form navbar-left" action="<?= $this->url->get('typedata/index') ?>" method="get" role="form">
+    <div class="form-group mt0 ">
+        提取：
+        <select class="form-control" id="status" name="status"  >
+            <option  value="0">请选择</option>
+            <option  value='1' <?php if ($search['status'] === '1') echo 'selected'?>>未提取</option>
+            <option  value="2" <?php if ($search['status'] == '2') echo 'selected'?>>已提取</option>
+        </select>
+        项目:
+        <select class="form-control" id="typeid" name="typeid"  >
+            <option  value="">请选择</option>
+            <?php foreach ($type as $ptype): ?>
+                <option  value='<?= $ptype->typeid;?>' <?php if ($search['tid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
+            <?php endforeach; ?>
+        </select>
+        上传时间：<input id="sttime"  class="form-control" name="sttime"  placeholder="开始日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['sttime'];?>">
+        -<input id="endtime"  class="form-control" name="endtime"  placeholder="结束日期"　data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['endtime'];?>">
+
+
+        <button type="submit" class="btn btn-flat btn-success">搜索</button>
+    </div>
+</form>
+<table class="table table-bordered text-center table-hover">
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>上传时间</th>
+        <th >提取</th>
+        <th>项目id</th>
+        <th>项目名称</th>
+        <th>数据</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($page->items as $item): ?>
+        <tr>
+            <td><?= $item->orderid;?></td>
+            <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
+            <td><?= $item->status=='1'?'未提取':'已提取';?></td>
+            <td><?= $item->tid;?></td>
+            <td><?= $typearrs[$item->tid];?></td>
+            <td><?= $item->data;?></td>
+            <td><a data-url="<?= $this->url->get('typedata/deldata?id='.$item->id) ?>"  class="btn btn-sm btn-danger delete">删除</a></td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+<?php $this->partial("common/pages", array('url' => 'typedata/index?page=', 'page' => $page)) ?>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">添加项目</h4>
+            </div>
+            <div id="mymodel" class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
