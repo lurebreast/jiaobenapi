@@ -59,7 +59,7 @@ try {
         );
 
     $loader->registerDirs($dirs)->register();
-    $di->set('view', function () use ($config, $host) {
+    $di->set('view', function () use ($config) {
         $view = new \Phalcon\Mvc\View();
             $dirs = array($config->viewsDir, $config->publicViewDir);
         $view->setBasePath($dirs);

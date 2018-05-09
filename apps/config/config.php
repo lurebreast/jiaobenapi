@@ -8,7 +8,7 @@ return array(
 	'publicModelsDir' => __DIR__ . '/../models/',
 	'baseUri' => '/',
 	'cookie' => array(
-		'domain' => '106.14.183.216',
+		'domain' => $_SERVER['HTTP_HOST'],
 	),
 
 	'database' => array(//mysql连接

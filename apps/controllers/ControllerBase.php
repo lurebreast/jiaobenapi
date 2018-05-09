@@ -10,7 +10,7 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
     }
     public function afterExecuteRoute() {
         $this->assets->addCss('css/bootstrap.min.css')
-            ->addCss('css/mdadmin.css?v='.rand(10,100));
+            ->addCss('css/mdadmin.css?v=1');
         $this->assets->addJs('js/jquery.js')
             ->addJs('js/bootstrap.min.js');
     }

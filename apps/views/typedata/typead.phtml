@@ -1,18 +1,38 @@
 <script>
 
-    $(document).on('click', '.delete', function(data) {
-        $self = $(this);
-        var r=confirm($self.attr('data-title'));
-        if (r==true)
-        {
-            window.location=$self.attr('data-url');
-        }
-        return ;
-    });
     function edittype(id)
     {
         htmlobj1 = $.ajax({url: "<?= $this->url->get('typedata/edittype?typeid=') ?>" + id , async: false});
         $("#mymodel").html(htmlobj1.responseText);
+    }
+
+    function selectAll(o) {
+        $("input:checkbox[name=typeid]").each(function(){
+            this.checked = o.checked;
+        });
+
+        return false;
+    }
+
+    function deltype() {
+        var typeid = '';
+        $("input:checkbox[name=typeid]").each(function(index){
+            if (this.checked) {
+                typeid += this.value + ',';
+            }
+        });
+
+        window.location.href = "<?= $this->url->get('typedata/deltype?typeid=') ?>" + typeid;
+    }
+    function cleardata() {
+        var typeid = '';
+        $("input:checkbox[name=typeid]").each(function(index){
+            if (this.checked) {
+                typeid += this.value + ',';
+            }
+        });
+
+        window.location.href = "<?= $this->url->get('typedata/cleardata?typeid=') ?>" + typeid;
     }
 </script>
 <div class="pd2 cf">
@@ -23,6 +43,7 @@
 <table class="table table-bordered text-center table-hover">
     <thead>
     <tr>
+        <td class="text-left"><input type="checkbox" onclick="selectAll(this)" />全选</td>
         <th>项目id</th>
         <th>项目名称</th>
         <th >操作</th>
@@ -31,14 +52,21 @@
     <tbody>
     <?php foreach ($type as $item): ?>
         <tr>
+            <td class="text-left"><input type="checkbox" name="typeid" value="<?= $item->typeid;?>"></td>
             <td><?= $item->typeid;?></td>
             <td><?= $item->typename;?></td>
-            <td><a data-url="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" data-title="删除项目" class="btn btn-sm btn-danger delete">删除</a>
-                <a data-url="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" data-title="清空数据"  class="btn btn-sm btn-danger delete">清除数据</a>
-                <a  onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" href="" title="修改" class="btn btn-sm btn-success">修改</a>
+            <td><a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
+                <a href="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">清除数据</a>
+                <a  onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" class="btn btn-sm btn-success">修改</a>
             </td>
         </tr>
     <?php endforeach; ?>
+    <tr>
+        <td class="text-left" colspan="4">
+            <button class="btn btn-sm btn-danger delete" onclick="deltype();">删除</button>
+            <button class="btn btn-sm btn-danger delete" onclick="cleardata();">清除数据</button>
+        </td>
+    </tr>
     </tbody>
 </table>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

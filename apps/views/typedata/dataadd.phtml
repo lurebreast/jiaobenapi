@@ -10,7 +10,7 @@
         <select class="form-control" id="typeid" name="typeid"  >
             <option  value="">请选择</option>
             <?php foreach ($type as $ptype): ?>
-                <option  value='<?= $ptype->typeid;?>' <?php if ($search['typeid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
+                <option  value='<?= $ptype->typeid;?>' <?php if (!empty($search) && $search['typeid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
             <?php endforeach; ?>
         </select>
         上传txt文件：<input name="name" type="file" id="av" style="display: inline-block" />

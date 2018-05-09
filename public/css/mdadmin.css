@@ -178,7 +178,7 @@ ul{
 .main-header{
     height:55px;
     padding-top:55px;
-    background: url('//admin.miduo.com/bestadmin/images/top_bg_hr.jpg') left top no-repeat;
+    #background: url('//admin.miduo.com/bestadmin/images/top_bg_hr.jpg') left top no-repeat;
     background-size:cover;
 }
 

@@ -84,7 +84,9 @@ class TypedataController  extends \ControllerAd{
                         'bind' => ['tid' => $typeid,'uid'=>$uid],
                         'order' => 'id DESC'
                     ]);
+
                     $orderid = $newsdata->orderid;
+
 //输出文本中所有的行，直到文件结束为止。
                     while(! feof($filess))
                     {
@@ -114,6 +116,7 @@ class TypedataController  extends \ControllerAd{
                         $typearr['orderid'] =$orderid;
                         $typearrs[] = $typearr;
                     }
+
                     $installkey = array('data','creattime','status','tid','uid','orderid');
                     $res = $typedata->insertall($installkey,$typearrs);
                     if ($res){
@@ -133,6 +136,7 @@ class TypedataController  extends \ControllerAd{
     public function apiAction(){
         $uid = $this->session->get('uid');
         $this->view->setVar("uid", $uid);
+        $this->view->setVar("domain_url", $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST']);
     }
     public function typeadAction(){
         $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
@@ -140,26 +144,25 @@ class TypedataController  extends \ControllerAd{
     }
     public function deltypeAction(){
         $typeid = $this->request->get('typeid');
-        $typeid = intval($typeid);
-        try {
-            if (empty($typeid)){
-                Throw new \Exception('项目id为空！');
+        $typeid = explode(',', $typeid);
+
+        $typename = '';
+        foreach ($typeid as $id) {
+            $id = intval($id);
+            if ($id && $types = \Type::findfirst(intval($id))) {
+                if ($types->delete()){
+                    $phql = "DELETE FROM Typedata WHERE tid = ".$id." and uid = ".$this->session->get('uid');
+                    $query = $this->modelsManager->createQuery($phql);
+                    $query->execute();
+                    $typename .= $types->typename.',';
+                }
             }
-            $types = \Type::findfirst($typeid);
-            if (empty($types)){
-                Throw new \Exception('没有该项目！');
-            }
-            if ($types->delete()){
-                $phql = "DELETE FROM Typedata WHERE tid = ".$typeid." and uid = ".$this->session->get('uid');
-                $query = $this->modelsManager->createQuery($phql);
-                $cars  = $query->execute();
-                $this->flashSession->success('删除项目'.$types->typename.'成功');
-            }else{
-                Throw new \Exception('删除失败！');
-            }
-        }catch (\Exception $e){
-            $this->flashSession->error($e->getMessage());
         }
+
+        if ($typename) {
+            $this->flashSession->success('项目'.rtrim($typename, ',').'删除成功');
+        }
+
         $this->response->redirect('typedata/typead');
     }
 
@@ -193,21 +196,21 @@ class TypedataController  extends \ControllerAd{
      */
     public function cleardataAction(){
         $typeid = $this->request->get('typeid');
-        $typeid = intval($typeid);
-        try {
-            if (empty($typeid)){
-                Throw new \Exception('项目id为空！');
-            }
-            $types = \Type::findfirst($typeid);
-            if (empty($types)){
-                Throw new \Exception('没有该项目！');
-            }
-                $phql = "DELETE FROM Typedata WHERE tid = ".$typeid." and uid = ".$this->session->get('uid');
+        $typeid = explode(',', $typeid);
+
+        $typename = '';
+        foreach ($typeid as $id) {
+            $id = intval($id);
+            if ($id && $types = \Type::findfirst($id)) {
+                $phql = "DELETE FROM Typedata WHERE tid = ".$id." and uid = ".$this->session->get('uid');
                 $query = $this->modelsManager->createQuery($phql);
-                $cars  = $query->execute();
-                $this->flashSession->success('清空项目'.$types->typename.'数据成功');
-        }catch (\Exception $e){
-            $this->flashSession->error($e->getMessage());
+                $query->execute();
+                $typename .= $types->typename.',';
+            }
+        }
+
+        if ($typename) {
+            $this->flashSession->success('清空项目'.rtrim($typename, ',').'数据成功');
         }
         $this->response->redirect('typedata/typead');
 
@@ -263,15 +266,86 @@ class TypedataController  extends \ControllerAd{
             "limit" => 30000
         ));
         $res = $paginator->getPaginate();
-        Header( "Content-type:   application/octet-stream ");
-        Header( "Accept-Ranges:   bytes ");
-        header( "Content-Disposition:   attachment;   filename=".$search['tid']."项目数据.txt ");
-        header( "Expires:   0 ");
-        header( "Cache-Control:   must-revalidate,   post-check=0,   pre-check=0 ");
-        header( "Pragma:   public ");
-        foreach ($res->items as $data){
-            echo $data->data."\r\n";
+
+        $file = '/tmp/data-'.date('Ymd').'.csv';
+
+        $csv_data = [[
+            '序号',
+            '上传时间',
+            '提取',
+            '项目id',
+            '项目名称',
+            '数据',
+
+        ]];
+
+        $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
+        $this->view->setVar("type", $typearr);
+        $typearrs = array();
+        foreach ($typearr as $v){
+            $typearrs[$v->typeid] = $v->typename;
         }
-    die();
+
+        foreach ($res->items as $data){
+            $csv_data[] = [
+                $data->id,
+                date('Y-m-d H:i:s', $data->creattime),
+                $data->status == 1 ? '未提取' : '已提取',
+                $data->tid,
+                $typearrs[$data->tid],
+                $data->data,
+            ];
+        }
+
+        $this->writeCsv($file, $csv_data, true);
+        $this->downloadCsv($file);
+    }
+
+    private function writeCsv($file, $data, $first = false)
+    {
+        $fp = fopen($file, 'a+');
+
+        //Windows下使用BOM来标记文本文件的编码方式
+        $first && fwrite($fp,chr(0xEF).chr(0xBB).chr(0xBF));
+
+        foreach ($data as $line) {
+            foreach ($line as $k => $v) {
+                if ($k === 'url') {
+                    unset($line[$k]);
+                }
+            }
+            fputcsv($fp, $line);
+        }
+
+        fclose($fp);
+        return true;
+    }
+
+    private function downloadCsv($file)
+    {
+        set_time_limit(0);  //大文件在读取内容未结束时会被超时处理，导致下载文件不全。
+
+        $fpath = $file;
+        $file_pathinfo = pathinfo($fpath);
+        $file_name = $file_pathinfo['basename'];
+        $handle = fopen($fpath,"rb");
+        if (FALSE === $handle)
+            exit("Failed to open the file");
+        $filesize = filesize($fpath);
+
+        header("Content-type:application/force-download");//更具不同的文件类型设置header输出类型
+        header("Accept-Ranges:bytes");
+        header("Accept-Length:".$filesize);
+        header("Content-Disposition: attachment; filename=".$file_name);
+
+        while (!feof($handle)) {
+            $contents = fread($handle, 8192);
+            echo $contents;
+            @ob_flush();  //把数据从PHP的缓冲中释放出来
+            flush();      //把被释放出来的数据发送到浏览器
+        }
+        fclose($handle);
+        unlink($fpath);
+        die;
     }
 }

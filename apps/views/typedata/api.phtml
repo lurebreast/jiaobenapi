@@ -3,11 +3,11 @@
 
 </div>
 <div class="col-sm-12">
-    <h1 >用户id<?=$uid?></h1>
-    <h1>接口地址：http://106.14.183.216/api</h1>
+    <h1 >用户id: <?=$uid?></h1>
+    <h1>接口地址：<?=$domain_url?>/api</h1>
     <hr>
     <h2>一、上传接口</h2>
-    <p>1、调用示例：http://106.14.183.216/api/set?typeid=1001&only=0&data=0000001&uid=2</p>
+    <p>1、调用示例：<?=$domain_url?>/api/set?typeid=1001&only=0&data=0000001&uid=2</p>
     <p>2、参数说明：</p>
     <p>2.1、uid：用户id；必传</p>
     <p>2.2、only：是否过滤重复数据；非必传；参数值0或1；默认值0；如果传1上传耗时稍长,</p>
@@ -18,7 +18,7 @@
     <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
     <hr>
     <h2>二、提取接口</h2>
-    <p>1、调用示例：http://106.14.183.216/api/get?typeid=1001&rand=1&uid=2</p>
+    <p>1、调用示例：<?=$domain_url?>/api/get?typeid=1001&rand=1&uid=2</p>
     <p>2、参数说明：</p>
     <p>2.1、typeid：项目ID；必传；用户端查看</p>
     <p>2.2、rand：是否获取随即；当rand为1时,随即获取改组数据,并且不会更新提取状态</p>
@@ -26,7 +26,7 @@
     <p>3.1、成功返回：OK|唯一标识|数据</p>
     <p>3.2、失败返回：ERR|失败原因</p>
     <h2>三、获取数量接口</h2>
-    <p>1、调用示例：http://106.14.183.216/api/getcount?typeid=1001&uid=2&status=1</p>
+    <p>1、调用示例：<?=$domain_url?>/api/getcount?typeid=1001&uid=2&status=1</p>
     <p>2、参数说明：</p>
     <p>2.1、uid：用户id；必传</p>
     <p>2.2、status：是否已提取；非必传；参数值1或2；1:未提取,2,已提取</p>
