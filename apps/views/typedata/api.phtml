@@ -5,6 +5,7 @@
 <div class="col-sm-12">
     <h1 >用户id: <?=$uid?></h1>
     <h1>接口地址：<?=$domain_url?>/api</h1>
+
     <hr>
     <h2>一、上传接口</h2>
     <p>1、调用示例：<?=$domain_url?>/api/set?uid=2&only=0&typeid=9&typedataid=4&data=0000001</p>
@@ -18,16 +19,24 @@
     <p>3、返回值说明：</p>
     <p>3.1、成功返回：OK|项目ID|数据ID</p>
     <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
+
     <hr>
     <h2>二、提取接口</h2>
     <p>1、调用示例：<?=$domain_url?>/api/get?typeid=9&rand=1&uid=2</p>
     <p>2、参数说明：</p>
+    <p>2.3、uid：用户id；必传</p>
     <p>2.1、typeid：项目ID；必传；用户端查看</p>
     <p>2.4、typedataid：数据ID；选传</p>
-    <p>2.2、rand：不传 更新提取状态, 0 获取1, typeid之间的随机获取一条数据, 1 获取指定数据ID数据</p>
-    <p>2.3、uid：用户id；必传</p>
+    <p>2.2、rand：
+        <br/>rand:0 提取单条数据：<?=$domain_url?>/api/get?uid=2&rand=0&typeid=26&typedataid=25814
+        <br/>rand:1 获取随机一条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?uid=2&rand=1&typeid=26
+        <br/>rand:不传, typedataid:不传 获取最新一条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?uid=2&typeid=26
+        <br/>rand:不传, typedataid:83 获取单条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?uid=2&typeid=26&typedataid=83
+    </p>
     <p>3.1、成功返回：OK|项目ID|数据ID</p>
     <p>3.2、失败返回：ERR|失败原因</p>
+
+    <hr>
     <h2>三、获取数量接口</h2>
     <p>1、调用示例：<?=$domain_url?>/api/getcount?typeid=9&uid=2&status=1</p>
     <p>2、参数说明：</p>

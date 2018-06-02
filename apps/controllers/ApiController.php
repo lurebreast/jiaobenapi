@@ -1,6 +1,8 @@
 <?php
-class ApiController extends \ControllerBase {
-    public function getAction(){
+class ApiController extends \ControllerBase
+{
+    public function getAction()
+    {
         $typeid =  $this->request->get('typeid');
         $typedataid =  $this->request->get('typedataid');
         $uid = $this->request->get('uid');
@@ -13,50 +15,65 @@ class ApiController extends \ControllerBase {
             $this->serror('没有用户id');
         }
 
-        if (isset($rand)){
-            if ($rand == 1) {
+        if (isset($rand) && $rand == 0) { // 获取单条数据不更新状态
+            $newdata = \Typedata::findfirst(
+                ['tid = :tid: and uid = :uid: and orderid = :orderid:',
+                    'bind' => ['tid' => $typeid,'uid'=>$uid,'orderid'=>$typedataid],
+                    'order' => 'id DESC']
+            );
+
+            if (!$newdata){
+                $this->serror('没有可用数据');
+            } else {
+                $this->ssussess($newdata->id.'|'.$newdata->data);
+            }
+        }
+
+        if (isset($rand) && $rand == 1){ //随机获取一条数据
                 $newdata = \Typedata::findfirst(
-                    ['tid = :tid: and uid = :uid:',
-                        'bind' => ['tid' => $typeid,'uid'=>$uid],
+                    ['tid = :tid: and uid = :uid: and status = :status:',
+                        'bind' => [
+                            'tid' => $typeid,
+                            'uid'=>$uid,
+                            'status' => '1'
+                        ],
                         'order' => 'id DESC']
                 );
                 $orderid = $newdata->orderid;
                 $randnum = rand(1,$orderid);
-                $newdata2 = \Typedata::findfirst(
-                    ['tid = :tid: and uid = :uid: and orderid = :orderid:',
-                        'bind' => ['tid' => $typeid,'uid'=>$uid,'orderid'=>$randnum],
-                        'order' => 'id DESC']
-                );
 
-            } elseif ($rand == 0) {
-                $newdata2 = \Typedata::findfirst(
-                    ['tid = :tid: and uid = :uid: and orderid = :orderid:',
-                        'bind' => ['tid' => $typeid,'uid'=>$uid,'orderid'=>$typedataid],
-                        'order' => 'id DESC']
-                );
-            }
-
-            if ($newdata2){
-                $this->ssussess($newdata2->id.'|'.$newdata2->data);
-            }
-        }
-
-        if ($typedataid) {
-            $newsdata = \Typedata::findfirst([
-                'tid = :tid: and uid = :uid: and status = :status: and orderid = :orderid:',
-                'bind' => ['tid' => $typeid,'uid'=>$uid, 'orderid'=>$typedataid, 'status'=>'1'],
-                'order' => 'id DESC'
-            ]);
-
+                $findData = [
+                    'tid = :tid: and uid = :uid: and orderid = :orderid:',
+                    'bind' => [
+                        'tid' => $typeid,
+                        'uid' => $uid,
+                        'orderid' => $randnum
+                    ]
+                ];
         } else {
-            $newsdata = \Typedata::findfirst([
-                'tid = :tid: and uid = :uid: and status = :status:',
-                'bind' => ['tid' => $typeid,'uid'=>$uid,'status'=>'1'],
-                'order' => 'id DESC'
-            ]);
+            if ($typedataid) { // 获取单条数据
+                $findData = [
+                    'tid = :tid: and uid = :uid: and status = :status: and orderid = :orderid:',
+                    'bind' => [
+                        'tid' => $typeid,
+                        'uid' => $uid,
+                        'orderid' => $typedataid,
+                        'status' => '1'
+                    ]
+                ];
+            } else {
+                $findData =[
+                    'tid = :tid: and uid = :uid: and status = :status:',
+                    'bind' => ['tid' => $typeid,'uid'=>$uid,'status'=>'1'],
+                    'order' => 'id DESC'
+                ];
+            }
         }
 
-        if (!empty($newsdata)){
+        $newsdata = \Typedata::findfirst($findData);
+        if (!$newsdata) {
+            $this->serror('没有可用数据');
+        } else {
             $newsdata->status = '2';
             $newsdata->updatetime = time();
             if ($newsdata->save()){
@@ -64,9 +81,6 @@ class ApiController extends \ControllerBase {
             }else{
                 $this->serror('数据保存失败');
             }
-
-        }else{
-            $this->serror('没有可用数据');
         }
     }
     public function setAction(){
