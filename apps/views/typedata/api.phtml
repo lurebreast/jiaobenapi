@@ -7,32 +7,35 @@
     <h1>接口地址：<?=$domain_url?>/api</h1>
     <hr>
     <h2>一、上传接口</h2>
-    <p>1、调用示例：<?=$domain_url?>/api/set?typeid=1001&only=0&data=0000001&uid=2</p>
+    <p>1、调用示例：<?=$domain_url?>/api/set?uid=2&only=0&typeid=9&typedataid=4&data=0000001</p>
     <p>2、参数说明：</p>
     <p>2.1、uid：用户id；必传</p>
     <p>2.2、only：是否过滤重复数据；非必传；参数值0或1；默认值0；如果传1上传耗时稍长,</p>
     <p>2.3、typeid：项目ID；必传</p>
+    <p>2.4、typedataid：数据ID；选传</p>
     <p>2.8、data：上传数据；必传</p>
+    <p>2.8、img：上传图片；选传</p>
     <p>3、返回值说明：</p>
-    <p>3.1、成功返回：OK|</p>
+    <p>3.1、成功返回：OK|项目ID|数据ID</p>
     <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
     <hr>
     <h2>二、提取接口</h2>
-    <p>1、调用示例：<?=$domain_url?>/api/get?typeid=1001&rand=1&uid=2</p>
+    <p>1、调用示例：<?=$domain_url?>/api/get?typeid=9&rand=1&uid=2</p>
     <p>2、参数说明：</p>
     <p>2.1、typeid：项目ID；必传；用户端查看</p>
-    <p>2.2、rand：是否获取随即；当rand为1时,随即获取改组数据,并且不会更新提取状态</p>
+    <p>2.4、typedataid：数据ID；选传</p>
+    <p>2.2、rand：不传 更新提取状态, 0 获取1, typeid之间的随机获取一条数据, 1 获取指定数据ID数据</p>
     <p>2.3、uid：用户id；必传</p>
-    <p>3.1、成功返回：OK|唯一标识|数据</p>
+    <p>3.1、成功返回：OK|项目ID|数据ID</p>
     <p>3.2、失败返回：ERR|失败原因</p>
     <h2>三、获取数量接口</h2>
-    <p>1、调用示例：<?=$domain_url?>/api/getcount?typeid=1001&uid=2&status=1</p>
+    <p>1、调用示例：<?=$domain_url?>/api/getcount?typeid=9&uid=2&status=1</p>
     <p>2、参数说明：</p>
     <p>2.1、uid：用户id；必传</p>
     <p>2.2、status：是否已提取；非必传；参数值1或2；1:未提取,2,已提取</p>
     <p>2.3、typeid：项目ID；必传</p>
     <p>3、返回值说明：</p>
-    <p>3.1、成功返回：OK|</p>
+    <p>3.1、成功返回：OK|数量</p>
     <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
 
 </div>

@@ -4,9 +4,10 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
 {
     public function beforeExecuteRoute() {
         \Phalcon\Tag::setTitleSeparator('·');
-        \Phalcon\Tag::setTitle('米多');
+        \Phalcon\Tag::setTitle('校长');
         $this->view->setTemplateAfter('after');
         $this->view->setVar('config', $this->config);
+        $this->view->setVar("domain_url", $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST']);
     }
     public function afterExecuteRoute() {
         $this->assets->addCss('css/bootstrap.min.css')

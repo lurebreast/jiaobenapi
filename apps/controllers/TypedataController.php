@@ -68,8 +68,8 @@ class TypedataController  extends \ControllerAd{
                 if ($this->request->hasFiles() != true) {
                     throw new \Exception('没有上传文件！');
                 }
-                foreach ($this->request->getUploadedFiles() as $file) {
 
+                foreach ($this->request->getUploadedFiles() as $file) {
                     $typeid = $this->request->getPost('typeid');
                     $typeid = intval($typeid);
                     if (empty( $typeid)){
@@ -136,7 +136,6 @@ class TypedataController  extends \ControllerAd{
     public function apiAction(){
         $uid = $this->session->get('uid');
         $this->view->setVar("uid", $uid);
-        $this->view->setVar("domain_url", $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST']);
     }
     public function typeadAction(){
         $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
@@ -275,24 +274,26 @@ class TypedataController  extends \ControllerAd{
             '提取',
             '项目id',
             '项目名称',
+            '图片',
             '数据',
-
         ]];
 
         $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
         $this->view->setVar("type", $typearr);
         $typearrs = array();
+
         foreach ($typearr as $v){
             $typearrs[$v->typeid] = $v->typename;
         }
 
         foreach ($res->items as $data){
             $csv_data[] = [
-                $data->id,
+                $data->orderid,
                 date('Y-m-d H:i:s', $data->creattime),
                 $data->status == 1 ? '未提取' : '已提取',
                 $data->tid,
                 $typearrs[$data->tid],
+                $this->view->getVar("domain_url").$data->img,
                 $data->data,
             ];
         }
