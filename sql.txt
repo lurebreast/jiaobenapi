@@ -1,0 +1,2 @@
+alter table typedata change img img varchar(255) default '';
+alter table typedata add img1 varchar(255) default '';
