@@ -192,6 +192,42 @@ class ApiController extends \ControllerBase
         $this->ssussess($countnum);
     }
 
+    public function delAction()
+    {
+        $uid = $this->request->get('uid');
+        $typeid =  $this->request->get('typeid');
+        $typedataid =  $this->request->get('typedataid');
+
+        if (empty($typeid)){
+            $this->serror('项目id为空');
+        }
+        if (empty($uid)){
+            $this->serror('没有用户id');
+        }
+        if (empty($typedataid)){
+            $this->serror('没有数据id');
+        }
+
+        $typedata = \Typedata::findfirst([
+            'uid = :uid: and tid = :tid: and orderid = :orderid:',
+            'bind' => [
+                'uid' => $uid,
+                'tid' => $typeid,
+                'orderid' => $typedataid
+            ]
+        ]);
+
+        if ($typedata) {
+            if ($typedata->delete()) {
+                $this->ssussess('');
+            } else {
+                $this->serror('删除失败');
+            }
+        } else {
+            $this->serror('没有数据');
+        }
+    }
+
     public function serror($msg){
         echo 'ERR|'.$msg;
         die();
