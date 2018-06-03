@@ -16,6 +16,7 @@
     <p>2.4、typedataid：数据ID；选传</p>
     <p>2.8、data：上传数据；必传</p>
     <p>2.8、img：上传图片；选传</p>
+    <p>2.8、img1：上传图片1；选传</p>
     <p>3、返回值说明：</p>
     <p>3.1、成功返回：OK|项目ID|数据ID</p>
     <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
@@ -33,7 +34,7 @@
         <br/>rand:不传, typedataid:不传 获取最新一条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?uid=2&typeid=26
         <br/>rand:不传, typedataid:83 获取单条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?uid=2&typeid=26&typedataid=83
     </p>
-    <p>3.1、成功返回：OK|项目ID|数据ID</p>
+    <p>3.1、成功返回：OK|项目ID|数据ID|数据|创建时间(时间戳)</p>
     <p>3.2、失败返回：ERR|失败原因</p>
 
     <hr>

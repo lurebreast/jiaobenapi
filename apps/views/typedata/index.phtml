@@ -52,12 +52,15 @@ $params = $_GET;
     <thead>
     <tr>
         <th>序号</th>
-        <th>上传时间</th>
+
         <th >提取</th>
         <th>项目id</th>
         <th>项目名称</th>
         <th>数据</th>
         <th>图片</th>
+        <th>图片1</th>
+        <th>上传时间</th>
+        <th>更新时间</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -65,12 +68,14 @@ $params = $_GET;
     <?php foreach ($page->items as $item): ?>
         <tr>
             <td><?= $item->orderid;?></td>
-            <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <td><?= $item->tid;?></td>
             <td><?= $typearrs[$item->tid];?></td>
             <td><?= $item->data;?></td>
             <td><? if($item->img){echo '<img src="'.$item->img.'" height="72"/>';}?></td>
+            <td><? if($item->img1){echo '<img src="'.$item->img1.'" height="72"/>';}?></td>
+            <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
+            <td><?= date('Y-m-d H:i:s',$item->updatetime);?></td>
             <td><a data-url="<?= $this->url->get('typedata/deldata?id='.$item->id) ?>"  class="btn btn-sm btn-danger delete">删除</a></td>
         </tr>
     <?php endforeach; ?>

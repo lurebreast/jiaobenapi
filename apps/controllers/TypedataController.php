@@ -275,6 +275,7 @@ class TypedataController  extends \ControllerAd{
             '项目id',
             '项目名称',
             '图片',
+            '图片1',
             '数据',
         ]];
 
@@ -293,7 +294,8 @@ class TypedataController  extends \ControllerAd{
                 $data->status == 1 ? '未提取' : '已提取',
                 $data->tid,
                 $typearrs[$data->tid],
-                $this->view->getVar("domain_url").$data->img,
+                $data->img ? $this->view->getVar("domain_url").$data->img : '',
+                $data->img1 ? $this->view->getVar("domain_url").$data->img1 : '',
                 $data->data,
             ];
         }
