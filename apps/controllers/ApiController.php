@@ -25,7 +25,7 @@ class ApiController extends \ControllerBase
             if (!$newdata){
                 $this->serror('没有可用数据');
             } else {
-                $this->ssussess($newdata->tid.'|'.$newdata->orderid.'|'.$newdata->data.'|'.$newdata->creattime);
+                $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));
             }
         }
 
@@ -77,7 +77,7 @@ class ApiController extends \ControllerBase
             $newdata->status = '2';
             $newdata->updatetime = time();
             if ($newdata->save()){
-                $this->ssussess($newdata->tid.'|'.$newdata->orderid.'|'.$newdata->data.'|'.$newdata->creattime);
+                $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));
             }else{
                 $this->serror('数据保存失败');
             }
@@ -138,13 +138,6 @@ class ApiController extends \ControllerBase
             unset($imgBin);
         }
 
-        $newsdata = \Typedata::findfirst([
-            'tid = :tid:  and uid = :uid:',
-            'bind' => ['tid' => $typeid,'uid'=>$uid],
-            'order' => 'id DESC'
-        ]);
-        $orderid = $newsdata ? $newsdata->orderid + 1 : 1;
-
         $typedata = \Typedata::findfirst([
                 'tid = :tid:  and uid = :uid: and orderid = :orderid:',
                 'bind' => ['tid' => $typeid,'uid'=>$uid, 'orderid' => $typedataid],
@@ -154,7 +147,7 @@ class ApiController extends \ControllerBase
         if (!$typedata->id) {
             $typedata->status = 1;
             $typedata->creattime = time();
-            $typedata->orderid = $orderid;
+            $typedata->orderid = $this->getOrderId($typeid, $uid);
             $typedata->tid = $typeid;
             $typedata->uid = $uid;
         }
@@ -238,7 +231,9 @@ class ApiController extends \ControllerBase
         die();
     }
    public function trimall($str){
-        $qian=array(" ","　","\t","\n","\r");
+        $qian=array("\n","\r");
         return str_replace($qian, '', $str);
     }
+
+
 }

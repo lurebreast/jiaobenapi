@@ -121,4 +121,23 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
         exit;
     }
 
+    protected function getOrderId($typeid, $uid = 2)
+    {
+        $redis = new Redis();
+        $redis->connect('127.0.0.1', 6379);
+
+        $key = 'increment_order_id_'.$typeid.'_'.$uid;
+        if (!$redis->exists($key)) {
+            $newsdata = \Typedata::findfirst([
+                'tid = :tid:  and uid = :uid:',
+                'bind' => ['tid' => $typeid,'uid'=>$uid],
+                'order' => 'id DESC'
+            ]);
+            $order_id = $newsdata ? $newsdata->orderid : 1;
+
+            $redis->set($key, $order_id);
+        }
+
+        return $redis->incr($key);
+    }
 }

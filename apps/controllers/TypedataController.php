@@ -61,6 +61,10 @@ class TypedataController  extends \ControllerAd{
         }
     }
     public function dataaddAction(){
+        $uid = $this->session->get('uid');
+        $typeid = $this->request->getPost('typeid');
+        $typeid = intval($typeid);
+
         $typearr = \Type::find();
         $this->view->setVar("type", $typearr);
         if ($this->request->isPost() && $this->security->checkToken()) {
@@ -69,58 +73,50 @@ class TypedataController  extends \ControllerAd{
                     throw new \Exception('没有上传文件！');
                 }
 
+                $installkey = array('data','creattime','status','tid','uid','orderid');
+
                 foreach ($this->request->getUploadedFiles() as $file) {
-                    $typeid = $this->request->getPost('typeid');
-                    $typeid = intval($typeid);
                     if (empty( $typeid)){
                         throw new \Exception('没有选择项目！');
                     }
                     $filess = fopen($file->getPathname(), "r");
                     $user=array();
                     $i=0;
-                    $uid = $this->session->get('uid');
-                    $newsdata = \Typedata::findfirst([
-                        'tid = :tid: and uid = :uid:',
-                        'bind' => ['tid' => $typeid,'uid'=>$uid],
-                        'order' => 'id DESC'
-                    ]);
+                    $time =time();
+                    $typedata = new  Typedata();
 
-                    $orderid = $newsdata->orderid;
-
-//输出文本中所有的行，直到文件结束为止。
+                    //输出文本中所有的行，直到文件结束为止。
                     while(! feof($filess))
                     {
-                        $user[$i]= fgets($filess);//fgets()函数从文件指针中读取一行
+                        $data = trim(fgets($filess));
+                        if (!$data) {
+                            continue;
+                        }
+
                         $i++;
-                    }
-                    fclose($filess);
-                    $user=array_filter($user);
-                    unlink($file->getPathname());
-                    $typedata = new  Typedata();
-                    $typearr = array();
-                    $typearrs = array();
-                    $time =time();
-                    $a = 0;
-                    foreach ($user as $data){
-                        $a++;
-                        $orderid++;
                         $encode = mb_detect_encoding($data, array('ASCII','UTF-8','GB2312','GBK'));
                         if ($encode != 'UTF-8'){
                             $data = iconv($encode,'UTF-8',$data);
                         }
-                        $typearr['data'] = $data;
-                        $typearr['creattime'] = $time;
-                        $typearr['status'] = '1';
-                        $typearr['tid'] =$typeid;
-                        $typearr['uid'] =$uid ;
-                        $typearr['orderid'] =$orderid;
-                        $typearrs[] = $typearr;
-                    }
 
-                    $installkey = array('data','creattime','status','tid','uid','orderid');
-                    $res = $typedata->insertall($installkey,$typearrs);
+                        $typearrs[] = [
+                            'data' => $data,
+                            'creattime' => $time,
+                            'status' => 1,
+                            'tid' => $typeid,
+                            'uid' => $uid,
+                            'orderid' => $this->getOrderId($typeid, $uid),
+                        ];
+                        if ($i % 100 === 0) {
+                            $res = $typedata->insertall($installkey,$typearrs);
+                            unset($typearrs);
+                        }
+                    }
+                    fclose($filess);
+                    unlink($file->getPathname());
+
                     if ($res){
-                        $this->flashSession->success('插入成功'.$a.'条数据');
+                        $this->flashSession->success('插入成功'.$i.'条数据');
                     }else{
                         $this->flashSession->error('插入数据失败!');
                     }

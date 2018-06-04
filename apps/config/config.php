@@ -19,7 +19,6 @@ return array(
 		'password' => '123456',
         'charset'=>'utf8',
 		'dbname' => 'jiaoben',
-
 	),
 
     'style' => array(
