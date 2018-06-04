@@ -256,11 +256,8 @@ class TypedataController  extends \ControllerAd{
         $uid = $this->session->get('uid');
         $datalists-> andwhere("uid = '".$uid."'");
         $datalists->orderBy('id desc');
-        $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
-            "builder" => $datalists,
-            "limit" => 30000
-        ));
-        $res = $paginator->getPaginate();
+
+
 
         $file = '/tmp/data-'.date('Ymd').'.csv';
 
@@ -284,30 +281,46 @@ class TypedataController  extends \ControllerAd{
             $typearrs[$v->typeid] = $v->typename;
         }
 
-        foreach ($res->items as $data){
-            $csv_data[] = [
-                $data->orderid,
-                $data->status == 1 ? '未提取' : '已提取',
-                $data->tid,
-                $typearrs[$data->tid],
-                $data->data,
-                $data->img ? $this->view->getVar("domain_url").$data->img : '',
-                $data->img1 ? $this->view->getVar("domain_url").$data->img1 : '',
-                date('Y-m-d H:i:s', $data->creattime),
-                $data->updatetime ? date('Y-m-d H:i:s', $data->updatetime) : '',
-            ];
+        $pages = 100;
+        for ($i = 1; $i <= $pages; $i++) {
+            $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
+                "builder" => $datalists,
+                "limit" => 1000,
+                "page" => $i
+            ));
+            $res = $paginator->getPaginate();
+
+            $first = $i == 1;
+
+            !$first && $csv_data = [];
+            foreach ($res->items as $data){
+                $csv_data[] = [
+                    $data->orderid,
+                    $data->status == 1 ? '未提取' : '已提取',
+                    $data->tid,
+                    $typearrs[$data->tid],
+                    $data->data,
+                    $data->img ? $this->view->getVar("domain_url").$data->img : '',
+                    $data->img1 ? $this->view->getVar("domain_url").$data->img1 : '',
+                    date('Y-m-d H:i:s', $data->creattime),
+                    $data->updatetime ? date('Y-m-d H:i:s', $data->updatetime) : '',
+                ];
+            }
+
+            $this->writeCsv($file, $csv_data, $first);
         }
 
-        $this->writeCsv($file, $csv_data, true);
         $this->downloadCsv($file);
     }
 
     private function writeCsv($file, $data, $first = false)
     {
-        $fp = fopen($file, 'a+');
-
-        //Windows下使用BOM来标记文本文件的编码方式
-        $first && fwrite($fp,chr(0xEF).chr(0xBB).chr(0xBF));
+        if ($first) {
+            $fp = fopen($file, 'w');
+            fwrite($fp,chr(0xEF).chr(0xBB).chr(0xBF)); //Windows下使用BOM来标记文本文件的编码方式
+        } else {
+            $fp = fopen($file, 'a+');
+        }
 
         foreach ($data as $line) {
             foreach ($line as $k => $v) {
