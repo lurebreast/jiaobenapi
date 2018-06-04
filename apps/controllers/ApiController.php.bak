@@ -77,7 +77,7 @@ class ApiController extends \ControllerBase
             $newsdata->status = '2';
             $newsdata->updatetime = time();
             if ($newsdata->save()){
-                $this->ssussess($newsdata->id.'|'.$newsdata->data);
+                $this->ssussess($newsdata->tid.'|'.$newsdata->orderid);
             }else{
                 $this->serror('数据保存失败');
             }

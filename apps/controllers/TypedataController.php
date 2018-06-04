@@ -270,14 +270,12 @@ class TypedataController  extends \ControllerAd{
 
         $csv_data = [[
             '序号',
+            '上传时间',
             '提取',
             '项目id',
             '项目名称',
-            '数据',
             '图片',
-            '图片1',
-            '上传时间',
-            '更新时间',
+            '数据',
         ]];
 
         $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
@@ -291,14 +289,12 @@ class TypedataController  extends \ControllerAd{
         foreach ($res->items as $data){
             $csv_data[] = [
                 $data->orderid,
+                date('Y-m-d H:i:s', $data->creattime),
                 $data->status == 1 ? '未提取' : '已提取',
                 $data->tid,
                 $typearrs[$data->tid],
+                $this->view->getVar("domain_url").$data->img,
                 $data->data,
-                $data->img ? $this->view->getVar("domain_url").$data->img : '',
-                $data->img1 ? $this->view->getVar("domain_url").$data->img1 : '',
-                date('Y-m-d H:i:s', $data->creattime),
-                $data->updatetime ? date('Y-m-d H:i:s', $data->updatetime) : '',
             ];
         }
 
