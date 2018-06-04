@@ -1,3 +1,4 @@
+
 <?php
 $geturl = $this->dispatcher->getControllerName() . '/' . $this->dispatcher->getActionName();
 $namespace = $this->dispatcher->getNamespaceName();
@@ -5,45 +6,101 @@ $namespace = strtolower($namespace);
 $controller = $this->dispatcher->getControllerName();
 $action = $this->dispatcher->getActionName();
 ?>
+
 <header class="main-header">
-    <div class="main-logo w100">
-        <a class="navbar-brand" href="#">校长管理后台</a>
-        <!-- <a href="#" class="" data-toggle="dropdown">用户管理<b class="caret"></b></a>-->
-        <a class="dropdown-toggle fr" href="<?= $this->url->get('auth/logout') ?>">退出后台</a>
-    </div>
-    <div class="main-nav navbar-blue">
-        <!-- Header Navbar: style can be found in header.less -->
-        <nav class="navbar navbar-default navbar-static-top cf" role="navigation">
+    <noscript>
+        <div class="noscript-warning">
+            Javascript is disabled in your web browser. Some features will not work properly.
+        </div>
+    </noscript>
+    <a class="logo" href="/"><span>校长管理后台</span></a>
+    <nav class="navbar navbar-static-top" role="navigation">
+        <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+            <span class="sr-only">Toggle navigation</span>
+        </a>
+
+        <div class="navbar-left">
+            <div class="hidden-xs">
+                <ol class="nav navbar-top-links breadcrumb">
+                    <li>
+                        <a href="/">
+                            <i class="fa fa-home"></i> </a>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
-
+                <li class="dropdown user-menu">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw" aria-hidden="true"></i> <i class="fa fa-caret-down" aria-hidden="true"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="<?=$this->url->get('auth/logout') ?>">退出登录</a></li>
+                    </ul>
+                </li>
             </ul>
-        </nav>
-    </div>
+        </div>
+    </nav>
 </header>
-<ul class="main-sidebar hidden-xs fixed">
 
-    <li <?php if($controller=='typedata'):?>class="on"<?php endif;?>>
-        <h5>数据管理</h5>
-        <p <?php if($controller=='typedata'&&$action=='index'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/index') ?>">数据列表</a></p>
-        <p <?php if($controller=='typedata'&&$action=='dataadd'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/dataadd') ?>">上传数据</a></p>
-        <p <?php if($controller=='typedata'&&$action=='api'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/api') ?>">接口说明</a></p>
-        <p <?php if($controller=='typedata'&&$action=='typead'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('typedata/typead') ?>">项目管理</a></p>
-    </li>
+<aside class="main-sidebar">
+    <section class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="<?php if($controller=='typedata'):?>active<?php endif;?> first treeview">
+                <a href="#">
+                    <i class="fa fa-folder"></i>
+                    <span>数据管理</span>
+                    <span class="pull-right-container">
+                        <i class="fa pull-right fa-angle-left"></i>
+                    </span>
+                </a>
+                <ul class="<?php if($controller=='typedata'):?>active<?php endif;?> treeview-menu menu_level_1">
+                    <li class="<?php if($controller=='typedata'&& $action=='index'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('typedata/index') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>数据列表
+                        </a>
+                    </li>
+                    <li class="<?php if($controller=='typedata'&& $action=='dataadd'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('typedata/dataadd') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>上传数据
+                        </a>
+                    </li>
+                    <li class="<?php if($controller=='typedata'&& $action=='api'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('typedata/api') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>接口说明
+                        </a>
+                    </li>
+                    <li class="<?php if($controller=='typedata'&& $action=='typead'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('typedata/typead') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>项目管理
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
-    <li <?php if($controller=='admin'):?>class="on"<?php endif;?>>
-        <h5>用户管理</h5>
-        <p <?php if($controller=='admin'&&$action=='adminlist'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('admin/adminlist') ?>">管理员列表</a></p>
-        <p <?php if($controller=='admin'&&$action=='addadmin'):?>class="active"<?php endif;?>><a href="<?= $this->url->get('admin/addadmin') ?>">添加管理员</a></p>
-    </li>
-
-    <footer class="main-footer text-center fixed">
-        Copyright © 2014-2017 <br>版权所有校长科技
-    </footer>
-</ul>
-<script type="text/javascript">
-    $('.main-sidebar li').on('click',function(){
-        var $obj = $(this);
-        $obj.addClass('on').siblings().removeClass('on');
-        //$obj.children('p').show().parent().siblings().children('p').hide();
-    })
-</script>
+            <li class="<?php if($controller=='admin'):?>active<?php endif;?> first treeview">
+                <a href="#">
+                    <i class="fa fa-folder"></i>
+                    <span>用户管理</span>
+                    <span class="pull-right-container">
+                        <i class="fa pull-right fa-angle-left"></i>
+                    </span>
+                </a>
+                <ul class="<?php if($controller=='admin'):?>active<?php endif;?> treeview-menu menu_level_1">
+                    <li class="<?php if($controller=='admin'&& $action=='adminlist'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('admin/adminlist') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>管理员列表
+                        </a>
+                    </li>
+                    <li class="<?php if($controller=='admin'&& $action=='addadmin'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('admin/addadmin') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>添加管理员
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+</aside>

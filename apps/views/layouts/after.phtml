@@ -1,16 +1,22 @@
-
-<?php if ($this->session->get('admin_auth')) { $this->partial("common/nav"); ?>
-    <div class="wrapper container">
-        <div class="row">
-            <section class="content-header">
-                <?php $this->flashSession->output() ?>
-                <?= $this->getContent() ?>
+<?php if ($this->session->get('admin_auth'))
+{
+?>
+    <div class="sonata-bc skin-black fixed wrapper">
+        <?php $this->partial("common/nav") ?>
+        <div class="content-wrapper">
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12 col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-body table-responsive no-padding">
+                                <?= $this->getContent() ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
         </div>
     </div>
 <?php } else { ?>
-    <div class="wrapper container">
         <?= $this->getContent() ?>
-        <p class="text-center">Copyright &copy; 2014-<?=date('Y')?> 版权所有 <a href="http://ad.miduo.com/auth/index" class="beian">校长科技</a></p>
-    </div>
 <?php } ?>
