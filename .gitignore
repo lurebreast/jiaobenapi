@@ -1,3 +1,4 @@
 /.idea
 /public/images/*
-public/php_errors.log
+/public/php_errors.log
+/apps/config/config.php
