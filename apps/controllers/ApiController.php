@@ -16,11 +16,20 @@ class ApiController extends \ControllerBase
         }
 
         if (isset($rand) && $rand == 0) { // 获取单条数据不更新状态
-            $newdata = \Typedata::findfirst(
-                ['tid = :tid: and uid = :uid: and orderid = :orderid:',
-                    'bind' => ['tid' => $typeid,'uid'=>$uid,'orderid'=>$typedataid],
-                    'order' => 'id DESC']
-            );
+
+            if ($typedataid) {
+                $newdata = \Typedata::findfirst(
+                    ['tid = :tid: and orderid = :orderid:',
+                        'bind' => ['tid' => $typeid, 'orderid' => $typedataid],
+                        'order' => 'id DESC']
+                );
+            } else {
+                $newdata = \Typedata::findfirst(
+                    ['tid = :tid:',
+                        'bind' => ['tid' => $typeid],
+                        'order' => 'id DESC']
+                );
+            }
 
             if (!$newdata){
                 $this->serror('没有可用数据');
@@ -31,10 +40,9 @@ class ApiController extends \ControllerBase
 
         if (isset($rand) && $rand == 1){ //随机获取一条数据
                 $newdata = \Typedata::findfirst(
-                    ['tid = :tid: and uid = :uid: and status = :status:',
+                    ['tid = :tid: and status = :status:',
                         'bind' => [
                             'tid' => $typeid,
-                            'uid'=>$uid,
                             'status' => '1'
                         ],
                         'order' => 'id DESC']
@@ -43,28 +51,26 @@ class ApiController extends \ControllerBase
                 $randnum = rand(1,$orderid);
 
                 $findData = [
-                    'tid = :tid: and uid = :uid: and orderid = :orderid:',
+                    'tid = :tid: and orderid = :orderid:',
                     'bind' => [
                         'tid' => $typeid,
-                        'uid' => $uid,
                         'orderid' => $randnum
                     ]
                 ];
         } else {
             if ($typedataid) { // 获取单条数据
                 $findData = [
-                    'tid = :tid: and uid = :uid: and status = :status: and orderid = :orderid:',
+                    'tid = :tid: and status = :status: and orderid = :orderid:',
                     'bind' => [
                         'tid' => $typeid,
-                        'uid' => $uid,
                         'orderid' => $typedataid,
                         'status' => '1'
                     ]
                 ];
             } else {
                 $findData =[
-                    'tid = :tid: and uid = :uid: and status = :status:',
-                    'bind' => ['tid' => $typeid,'uid'=>$uid,'status'=>'1'],
+                    'tid = :tid: and status = :status:',
+                    'bind' => ['tid' => $typeid, 'status'=>'1'],
                     'order' => 'id DESC'
                 ];
             }
@@ -140,7 +146,7 @@ class ApiController extends \ControllerBase
 
         $typedata = \Typedata::findfirst([
                 'tid = :tid:  and uid = :uid: and orderid = :orderid:',
-                'bind' => ['tid' => $typeid,'uid'=>$uid, 'orderid' => $typedataid],
+                'bind' => ['tid' => $typeid, 'uid'=>$uid, 'orderid' => $typedataid],
                 'order' => 'id DESC'
             ]) ?: new \Typedata();
 
@@ -161,7 +167,8 @@ class ApiController extends \ControllerBase
             $this->serror('数据保存失败');
         }
     }
-    public function getcountAction(){
+    public function getcountAction()
+    {
         $typeid =  $this->request->get('typeid');
         $uid = $this->request->get('uid');
         $status = $this->request->get('status');
@@ -173,13 +180,13 @@ class ApiController extends \ControllerBase
         }
         if (!empty($status)){
             $countnum = \Typedata::count([
-                'tid = :tid:  and uid = :uid: and status = :status:',
-                'bind' => ['tid' => $typeid,'uid'=>$uid,'status'=>$status]
+                'tid = :tid: and status = :status:',
+                'bind' => ['tid' => $typeid,'status'=>$status]
             ]);
         }else{
             $countnum = \Typedata::count([
-                'tid = :tid:  and uid = :uid:',
-                'bind' => ['tid' => $typeid,'uid'=>$uid]
+                'tid = :tid:',
+                'bind' => ['tid' => $typeid]
             ]);
         }
         $this->ssussess($countnum);
