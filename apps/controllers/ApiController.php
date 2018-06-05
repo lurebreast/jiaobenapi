@@ -170,14 +170,19 @@ class ApiController extends \ControllerBase
     public function getcountAction()
     {
         $typeid =  $this->request->get('typeid');
-        $uid = $this->request->get('uid');
         $status = $this->request->get('status');
         if (empty($typeid)){
             $this->serror('项目id为空');
         }
-        if (empty($uid)){
-            $this->serror('没有用户id');
+
+        $redis = $this->getRedis();
+        $key = 'typeid_count_'.$typeid.'_'.$status;
+
+        if ($countnum = $redis->get($key)) {
+            $this->ssussess($countnum);
         }
+
+
         if (!empty($status)){
             $countnum = \Typedata::count([
                 'tid = :tid: and status = :status:',
@@ -189,6 +194,8 @@ class ApiController extends \ControllerBase
                 'bind' => ['tid' => $typeid]
             ]);
         }
+
+        $redis->setex($key, 60, $countnum);
         $this->ssussess($countnum);
     }
 

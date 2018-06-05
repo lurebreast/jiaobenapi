@@ -123,8 +123,7 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
 
     protected function getOrderId($typeid, $uid = 2)
     {
-        $redis = new Redis();
-        $redis->connect('127.0.0.1', 6379);
+        $redis = $this->getRedis();
 
         $key = 'increment_order_id_'.$typeid.'_'.$uid;
         if (!$redis->exists($key)) {
@@ -139,5 +138,13 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
         }
 
         return $redis->incr($key);
+    }
+
+    protected function getRedis()
+    {
+        $redis = new Redis();
+        $redis->connect('127.0.0.1');
+
+        return $redis;
     }
 }
