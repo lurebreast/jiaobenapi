@@ -61,6 +61,9 @@ class TypedataController  extends \ControllerAd{
         }
     }
     public function dataaddAction(){
+        ignore_user_abort();//关掉浏览器，PHP脚本也可以继续执行.
+        set_time_limit(0);//通过set_time_limit(0)可以让程序无限制的执行下去
+
         $uid = $this->session->get('uid');
         $typeid = $this->request->getPost('typeid');
         $typeid = intval($typeid);
@@ -73,8 +76,6 @@ class TypedataController  extends \ControllerAd{
                     throw new \Exception('没有上传文件！');
                 }
 
-                $installkey = array('data','creattime','status','tid','uid','orderid');
-
                 foreach ($this->request->getUploadedFiles() as $file) {
                     if (empty( $typeid)){
                         throw new \Exception('没有选择项目！');
@@ -84,6 +85,13 @@ class TypedataController  extends \ControllerAd{
                     $i=0;
                     $time =time();
                     $typedata = new  Typedata();
+
+                    $manager = $this->modelsManager;
+
+
+                    // Inserting using placeholders
+                    $phql = "INSERT INTO typedata (data, creattime, status, tid, uid, orderid)"
+                        . "VALUES (:data:, :creattime:, :status:, :tid:, :uid:, :orderid:)";
 
                     //输出文本中所有的行，直到文件结束为止。
                     while(! feof($filess))
@@ -99,18 +107,31 @@ class TypedataController  extends \ControllerAd{
                             $data = iconv($encode,'UTF-8',$data);
                         }
 
-                        $typearrs[] = [
-                            'data' => $data,
-                            'creattime' => $time,
-                            'status' => 1,
-                            'tid' => $typeid,
-                            'uid' => $uid,
-                            'orderid' => $this->getOrderId($typeid, $uid),
-                        ];
-                        if ($i % 100 === 0) {
-                            $res = $typedata->insertall($installkey,$typearrs);
-                            unset($typearrs);
-                        }
+                        $manager->executeQuery(
+                            $phql,
+                            [
+                                'data' => $data,
+                                'creattime' => $time,
+                                'status' => 1,
+                                'tid' => $typeid,
+                                'uid' => $uid,
+                                'orderid' => $this->getOrderId($typeid, $uid),
+                            ]
+                        );
+
+
+//                        $typearrs[] = [
+//                            'data' => $data,
+//                            'creattime' => $time,
+//                            'status' => 1,
+//                            'tid' => $typeid,
+//                            'uid' => $uid,
+//                            'orderid' => $this->getOrderId($typeid, $uid),
+//                        ];
+//                        if ($i % 100 === 0) {
+//                            $res = $typedata->insertall($installkey,$typearrs);
+//                            unset($typearrs);
+//                        }
                     }
                     fclose($filess);
                     unlink($file->getPathname());
@@ -241,22 +262,39 @@ class TypedataController  extends \ControllerAd{
         $search['status'] =$getlist['status'];
         $search['sttime'] =$getlist['sttime'];
         $search['endtime'] =$getlist['endtime'];
+
+        $uid = $this->session->get('uid');
+        $datalists-> andwhere("uid = '".$uid."'");
+
+        $bind = ['uid' => $uid];
+        $preSql = "uid = :uid:";
         if (!empty($search['status'])){
             $datalists-> andwhere("status = '".$search['status']."'");
+            $bind['status'] = $search['status'];
+            $preSql .= " and status = :status:";
         }
         if (!empty($search['tid'])){
             $datalists-> andwhere("tid = '".$search['tid']."'");
+            $bind['tid'] = $search['tid'];
+            $preSql .= " and tid = :tid:";
         }
         if (!empty($search['sttime'])){
             $datalists-> andwhere("creattime >= ".strtotime($search['sttime']));
+            $bind['creattime'] = $search['sttime'];
+            $preSql .= " and creattime >= :creattime:";
         }
         if (!empty($search['endtime'])){
             $datalists-> andwhere("creattime < ".strtotime($search['endtime']));
+            $bind['creattime'] = $search['endtime'];
+            $preSql .= " and creattime < :endtime:";
         }
-        $uid = $this->session->get('uid');
-        $datalists-> andwhere("uid = '".$uid."'");
-        $datalists->orderBy('id desc');
 
+        $countnum = \Typedata::count([
+            $preSql,
+            'bind' => $bind
+        ]);
+
+        $datalists->orderBy('id desc');
 
 
         $file = '/tmp/data-'.date('Ymd').'.csv';
@@ -281,7 +319,7 @@ class TypedataController  extends \ControllerAd{
             $typearrs[$v->typeid] = $v->typename;
         }
 
-        $pages = 100;
+        $pages = ceil($countnum / 1000);
         for ($i = 1; $i <= $pages; $i++) {
             $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
                 "builder" => $datalists,
