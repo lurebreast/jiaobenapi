@@ -13,7 +13,7 @@
                 <option  value='<?= $ptype->typeid;?>' <?php if (!empty($search) && $search['typeid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
             <?php endforeach; ?>
         </select>
-        上传txt文件：<input name="name" type="file" id="av" style="display: inline-block" />
+        上传txt文件(文件名必须是英文或者拼音)：<input name="name" type="file" id="av" style="display: inline-block" />
         <button type="submit" class="btn btn-flat btn-success">上传</button>
     </div>
 

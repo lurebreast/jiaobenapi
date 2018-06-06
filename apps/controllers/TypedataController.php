@@ -68,6 +68,7 @@ class TypedataController  extends \ControllerAd{
         $typeid = $this->request->getPost('typeid');
         $typeid = intval($typeid);
 
+        $exce = false;
         $typearr = \Type::find();
         $this->view->setVar("type", $typearr);
         if ($this->request->isPost() && $this->security->checkToken()) {
@@ -76,75 +77,28 @@ class TypedataController  extends \ControllerAd{
                     throw new \Exception('没有上传文件！');
                 }
 
-                $manager = $this->modelsManager;
                 foreach ($this->request->getUploadedFiles() as $file) {
                     if (empty( $typeid)){
                         throw new \Exception('没有选择项目！');
                     }
-                    $filess = fopen($file->getPathname(), "r");
-                    $i=0;
-                    $time =time();
 
-                    // Inserting using placeholders
-                    $phql = "INSERT INTO Typedata (data, creattime, status, tid, uid, orderid)"
-                        . "VALUES (:data:, :creattime:, :status:, :tid:, :uid:, :orderid:)";
+                    $file_name = $_SERVER['DOCUMENT_ROOT'].'/../apps/cron/'.$file->getName();
 
-                    //输出文本中所有的行，直到文件结束为止。
-                    while(! feof($filess))
-                    {
-                        $data = trim(fgets($filess));
-                        if (!$data) {
-                            continue;
-                        }
-
-                        $i++;
-                        $encode = mb_detect_encoding($data, array('ASCII','UTF-8','GB2312','GBK'));
-                        if ($encode != 'UTF-8'){
-                            $data = iconv($encode,'UTF-8',$data);
-                        }
-
-                        $manager->executeQuery(
-                            $phql,
-                            [
-                                'data' => $data,
-                                'creattime' => $time,
-                                'status' => 1,
-                                'tid' => $typeid,
-                                'uid' => $uid,
-                                'orderid' => $this->getOrderId($typeid, $uid),
-                            ]
-                        );
-
-
-//                        $typearrs[] = [
-//                            'data' => $data,
-//                            'creattime' => $time,
-//                            'status' => 1,
-//                            'tid' => $typeid,
-//                            'uid' => $uid,
-//                            'orderid' => $this->getOrderId($typeid, $uid),
-//                        ];
-//                        if ($i % 100 === 0) {
-//                            $res = $typedata->insertall($installkey,$typearrs);
-//                            unset($typearrs);
-//                        }
-                    }
-                    fclose($filess);
-                    unlink($file->getPathname());
-
-                    if ($res){
-                        $this->flashSession->success('插入成功'.$i.'条数据');
-                    }else{
-                        $this->flashSession->error('插入数据失败!');
+                    if (file_exists($file_name)) {
+                        throw new \Exception($file->getName()."文件已经上传，请务重复");
                     }
 
+                    $file->moveTo($file_name);
+                    $this->getRedis()->lPush('dataadd_files', json_encode(['tid' => $typeid, 'file' => $file_name]));
                 }
             } catch (\Exception $e) {
                 $this->flashSession->error($e->getMessage());
+                $exce = true;
             }
-            $this->response->redirect('typedata/index?typeid='.$typeid);
-        }
 
+            !$exce && $this->flashSession->success('文件上传成功，等待后台执行导入数据');
+            $this->response->redirect('typedata/dataadd');
+        }
     }
     public function apiAction(){
         $uid = $this->session->get('uid');
