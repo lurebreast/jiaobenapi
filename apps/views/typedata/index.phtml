@@ -23,7 +23,7 @@ $params = $_GET;
 <div class="pd2 cf">
     <h4 class="fl">数据列表</h4>
     <h4 class="fr"><a  onclick="addtype()"  data-toggle="modal" data-target="#myModal" id="data" href="" title="添加项目" class="btn btn-sm btn-success">添加项目</a></h4>
-    <h4 class="fr"><a   href="<?= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['tid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime']) ?>" title="导出" class="btn btn-sm btn-success">导出</a></h4>
+    <h4 class="fr"><a   href="<?= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['tid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime']) ?>" title="导出" class="btn btn-sm btn-success">导出(最多导出十万条)</a></h4>
 
 </div>
 <form class="navbar-form navbar-left" action="<?= $this->url->get('typedata/index') ?>" method="get" role="form">
