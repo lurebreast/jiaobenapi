@@ -86,7 +86,7 @@ class TypedataController  extends \ControllerAd{
                     $time =time();
 
                     // Inserting using placeholders
-                    $phql = "INSERT INTO typedata (data, creattime, status, tid, uid, orderid)"
+                    $phql = "INSERT INTO Typedata (data, creattime, status, tid, uid, orderid)"
                         . "VALUES (:data:, :creattime:, :status:, :tid:, :uid:, :orderid:)";
 
                     //输出文本中所有的行，直到文件结束为止。
