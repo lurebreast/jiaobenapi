@@ -76,18 +76,14 @@ class TypedataController  extends \ControllerAd{
                     throw new \Exception('没有上传文件！');
                 }
 
+                $manager = $this->modelsManager;
                 foreach ($this->request->getUploadedFiles() as $file) {
                     if (empty( $typeid)){
                         throw new \Exception('没有选择项目！');
                     }
                     $filess = fopen($file->getPathname(), "r");
-                    $user=array();
                     $i=0;
                     $time =time();
-                    $typedata = new  Typedata();
-
-                    $manager = $this->modelsManager;
-
 
                     // Inserting using placeholders
                     $phql = "INSERT INTO typedata (data, creattime, status, tid, uid, orderid)"
@@ -254,50 +250,33 @@ class TypedataController  extends \ControllerAd{
         $this->response->redirect('typedata/index?typeid='.$tid);
     }
     public function outdataAction(){
-        $datalists = $this->modelsManager->createBuilder()
-            ->from('Typedata')
-        ;
         $getlist = $this->request->get();
         $search['tid'] =$getlist['typeid'];
         $search['status'] =$getlist['status'];
         $search['sttime'] =$getlist['sttime'];
         $search['endtime'] =$getlist['endtime'];
 
-        $uid = $this->session->get('uid');
-        $datalists-> andwhere("uid = '".$uid."'");
-
-        $bind = ['uid' => $uid];
-        $preSql = "uid = :uid:";
-        if (!empty($search['status'])){
-            $datalists-> andwhere("status = '".$search['status']."'");
-            $bind['status'] = $search['status'];
-            $preSql .= " and status = :status:";
+        if (empty($search['tid'])) {
+            $this->flashSession->error('必须选择一个项目');
+            header('Location:/typedata/index');
+            die;
         }
-        if (!empty($search['tid'])){
-            $datalists-> andwhere("tid = '".$search['tid']."'");
-            $bind['tid'] = $search['tid'];
-            $preSql .= " and tid = :tid:";
+
+        $where = "t.tid = '{$search['tid']}'";
+        if (!empty($search['status'])){
+            $where .= " and status = '{$search['status']}'";
         }
         if (!empty($search['sttime'])){
-            $datalists-> andwhere("creattime >= ".strtotime($search['sttime']));
-            $bind['creattime'] = $search['sttime'];
-            $preSql .= " and creattime >= :creattime:";
+            $where .= " and t.creattime >= '".strtotime($search['sttime'])."'";
         }
         if (!empty($search['endtime'])){
-            $datalists-> andwhere("creattime < ".strtotime($search['endtime']));
-            $bind['creattime'] = $search['endtime'];
-            $preSql .= " and creattime < :endtime:";
+            $where .= " and t.creattime < '".strtotime($search['endtime'])."'";
         }
 
-        $countnum = \Typedata::count([
-            $preSql,
-            'bind' => $bind
-        ]);
+        $phql = "SELECT count(*) as total FROM Typedata AS t WHERE $where";
+        $countnum =  $this->modelsManager->createQuery($phql)->getSingleResult()->total;
 
-        $datalists->orderBy('id desc');
-
-
-        $file = '/tmp/data-'.date('Ymd').'.csv';
+        $file = '/tmp/data-'.time().'.csv';
 
         $csv_data = [[
             '序号',
@@ -319,19 +298,23 @@ class TypedataController  extends \ControllerAd{
             $typearrs[$v->typeid] = $v->typename;
         }
 
-        $pages = ceil($countnum / 1000);
+        $limit = 1000;
+        $pages = ceil($countnum / $limit);
+        $pages > 100 && $pages = 100; // 最多取十万条数据
         for ($i = 1; $i <= $pages; $i++) {
-            $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
-                "builder" => $datalists,
-                "limit" => 1000,
-                "page" => $i
-            ));
-            $res = $paginator->getPaginate();
 
             $first = $i == 1;
+            if ($first) {
+                $phql = "SELECT t.* FROM Typedata AS t WHERE $where order by id desc limit $limit";
+
+            } else {
+                $phql = "SELECT t.* FROM Typedata AS t WHERE id < '{$id}' and $where order by id desc limit $limit";
+            }
+
+            $res = $total = $this->modelsManager->createQuery($phql)->execute();
 
             !$first && $csv_data = [];
-            foreach ($res->items as $data){
+            foreach ($res as $data){
                 $csv_data[] = [
                     $data->orderid,
                     $data->status == 1 ? '未提取' : '已提取',
@@ -344,6 +327,8 @@ class TypedataController  extends \ControllerAd{
                     $data->updatetime ? date('Y-m-d H:i:s', $data->updatetime) : '',
                     $data->data,
                 ];
+
+                $id = $data->id;
             }
 
             $this->writeCsv($file, $csv_data, $first);
