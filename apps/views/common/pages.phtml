@@ -1,6 +1,7 @@
 <?php
 $start_num = ($page->current > 5) ? ($page->current - 5) : 1;
 $total_num = (($start_num + 9) <= $page->total_pages) ? (($start_num + 9)) : $page->total_pages;
+$total_items = $page->total_items;
 $params = $_GET;
 $params['page'] = 1;
 ?>
@@ -47,9 +48,11 @@ $params['page'] = 1;
                     <li class="paginate_button next"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">&raquo;</span> </a></li>
                     <?php  $params['page'] = $page->last; ?>
                     <li class="paginate_button"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">尾页</span> </a></li>
+                    <li class="paginate_button"><span>总条数：<?=$total_items?></span</li>
                 </ul>
 
             </div>
+
         </div>
     </div>
 </div>

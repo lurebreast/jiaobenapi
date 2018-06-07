@@ -28,23 +28,11 @@ if ($json = $redis->lPop('dataadd_files')) {
             exit;
         }
 
-
-        //构造SQL语句
-        $query = "SELECT * FROM  typedata where tid={$tid} order by id desc limit 1";
-        //执行SQL语句
-
-        $result = $mysqli->query($query);
-        //遍历结果
-
-        $orderid = $result->fetch_array(MYSQLI_BOTH)['orderid'];
-        empty($orderid) && $orderid = 1;
-
         $fp = fopen($file, "r");
         $time = time();
 
         //输出文本中所有的行，直到文件结束为止。
         while (!feof($fp)) {
-            $orderid++;
 
             $data = trim(fgets($fp));
             if (!$data) {
@@ -56,7 +44,7 @@ if ($json = $redis->lPop('dataadd_files')) {
                 $data = iconv($encode, 'UTF-8', $data);
             }
 
-            $mysqli->query("insert into typedata(data, creattime, status, tid, uid, orderid) value('{$data}', '$time', 1, '$tid', '2', '$orderid')");
+            $mysqli->query("insert into typedata(data, creattime, status, tid, uid, orderid) value('{$data}', '$time', 1, '$tid', '2', '".getOrderId($tid)."')");
 
             echo $mysqli->insert_id . "\n";
         }
@@ -64,4 +52,30 @@ if ($json = $redis->lPop('dataadd_files')) {
         $mysqli->close();
         unlink($file);
     }
+}
+
+function getOrderId($tid)
+{
+    global $mysqli;
+
+    $redis = new Redis();
+    $redis->connect('127.0.0.1');
+
+    $key = 'increment_order_id_'.$tid.'_2';
+    if (!$redis->exists($key)) {
+
+        //构造SQL语句
+        $query = "SELECT * FROM  typedata where tid={$tid} order by id desc limit 1";
+        //执行SQL语句
+
+        $result = $mysqli->query($query);
+        //遍历结果
+
+        $orderid = $result->fetch_array(MYSQLI_BOTH)['orderid'];
+        empty($orderid) && $orderid = 0;
+
+        $redis->set($key, $orderid);
+    }
+
+    return $redis->incr($key);
 }
