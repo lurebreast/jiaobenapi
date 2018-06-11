@@ -28,35 +28,35 @@ try {
         $url->setBaseUri('/');
         return $url;
     });
-    $di->set('flashSession', function() use ($config) {
-        $flash = new \Phalcon\Flash\Session(array(
-            'error' => $config->style->error,
-            'success' => $config->style->success,
-            'notice' => $config->style->notice,
-        ));
-        return $flash;
-    });
 
-    //session_set_cookie_params(0, '/', $config->cookie->domain, false, true);
+    if (strpos($_SERVER['REQUEST_URI'], '/api/') === false) {
+        $di->set('flashSession', function() use ($config) {
+            $flash = new \Phalcon\Flash\Session(array(
+                'error' => $config->style->error,
+                'success' => $config->style->success,
+                'notice' => $config->style->notice,
+            ));
+            return $flash;
+        });
 
-    $session = new \Phalcon\Session\Adapter\Files();
-    $session->start();
+        $session = new \Phalcon\Session\Adapter\Files();
+        $session->start();
 
-
-    $di->set('session', function () use ($session) {
-        return $session;
-    });
+        $di->set('session', function () use ($session) {
+            return $session;
+        });
+    }
 
     $loader = new \Phalcon\Loader();
 
-        $dirs = array(
-            $config->controllersDir,
-            $config->publicControllerDir,
-            $config->modelsDir,
-            $config->publicModelsDir,
-            $config->collectionDir,
-            $config->libraryDir,
-        );
+    $dirs = array(
+        $config->controllersDir,
+        $config->publicControllerDir,
+        $config->modelsDir,
+        $config->publicModelsDir,
+        $config->collectionDir,
+        $config->libraryDir,
+    );
 
     $loader->registerDirs($dirs)->register();
     $di->set('view', function () use ($config) {
