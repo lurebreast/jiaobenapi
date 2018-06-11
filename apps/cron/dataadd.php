@@ -44,7 +44,7 @@ if ($json = $redis->lPop('dataadd_files')) {
                 $data = iconv($encode, 'UTF-8', $data);
             }
 
-            $mysqli->query("insert into typedata(data, creattime, status, tid, uid, orderid) value('{$data}', '$time', 1, '$tid', '2', '".getOrderId($tid)."')");
+            $mysqli->query("insert into typedata(data, creattime, status, tid, orderid) value('{$data}', '$time', 1, '$tid', '".getOrderId($tid)."')");
 
             echo $mysqli->insert_id . "\n";
         }

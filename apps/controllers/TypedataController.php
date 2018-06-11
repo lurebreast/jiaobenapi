@@ -5,7 +5,7 @@ class TypedataController  extends \ControllerAd{
     public function indexAction(){
 
         $page = $this->request->get('page', 'int', 1);
-        $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
+        $typearr = \Type::find();
         $this->view->setVar("type", $typearr);
         $typearrs = array();
         foreach ($typearr as $v){
@@ -33,8 +33,6 @@ class TypedataController  extends \ControllerAd{
         if (!empty($search['endtime'])){
             $datalists-> andwhere("creattime < ".strtotime($search['endtime']));
         }
-        $uid = $this->session->get('uid');
-        $datalists-> andwhere("uid = '".$uid."'");
         $datalists->orderBy('id desc');
         $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
             "builder" => $datalists,
@@ -51,7 +49,6 @@ class TypedataController  extends \ControllerAd{
             $typename=$this->request->getPost('typename');
             $type = new Type();
             $type->typename = $typename;
-            $type->uid = $this->session->get('uid');
             if ($type->save()){
                 $this->flashSession->success('添加成功');
             }else{
@@ -64,7 +61,6 @@ class TypedataController  extends \ControllerAd{
         ignore_user_abort();//关掉浏览器，PHP脚本也可以继续执行.
         set_time_limit(0);//通过set_time_limit(0)可以让程序无限制的执行下去
 
-        $uid = $this->session->get('uid');
         $typeid = $this->request->getPost('typeid');
         $typeid = intval($typeid);
 
@@ -105,7 +101,7 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("uid", $uid);
     }
     public function typeadAction(){
-        $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
+        $typearr = \Type::find();
         $this->view->setVar("type", $typearr);
     }
     public function deltypeAction(){
@@ -117,7 +113,7 @@ class TypedataController  extends \ControllerAd{
             $id = intval($id);
             if ($id && $types = \Type::findfirst(intval($id))) {
                 if ($types->delete()){
-                    $phql = "DELETE FROM Typedata WHERE tid = ".$id." and uid = ".$this->session->get('uid');
+                    $phql = "DELETE FROM Typedata WHERE tid = ".$id;
                     $query = $this->modelsManager->createQuery($phql);
                     $query->execute();
                     $typename .= $types->typename.',';
@@ -168,7 +164,7 @@ class TypedataController  extends \ControllerAd{
         foreach ($typeid as $id) {
             $id = intval($id);
             if ($id && $types = \Type::findfirst($id)) {
-                $phql = "DELETE FROM Typedata WHERE tid = ".$id." and uid = ".$this->session->get('uid');
+                $phql = "DELETE FROM Typedata WHERE tid = ".$id;
                 $query = $this->modelsManager->createQuery($phql);
                 $query->execute();
                 $typename .= $types->typename.',';
@@ -246,7 +242,7 @@ class TypedataController  extends \ControllerAd{
             '数据',
         ]];
 
-        $typearr = \Type::find(array(array('uid'=>$this->session->get('uid'))));
+        $typearr = \Type::find();
         $this->view->setVar("type", $typearr);
         $typearrs = array();
 

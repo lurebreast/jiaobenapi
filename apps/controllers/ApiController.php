@@ -5,14 +5,10 @@ class ApiController extends \ControllerBase
     {
         $typeid =  $this->request->get('typeid');
         $typedataid =  $this->request->get('typedataid');
-        $uid = $this->request->get('uid');
         $rand = $this->request->get('rand');
 
         if (empty($typeid)){
             $this->serror('没有项目id');
-        }
-        if (empty($uid)){
-            $this->serror('没有用户id');
         }
 
         if (isset($rand) && $rand == 0) { // 获取单条数据不更新状态
@@ -187,24 +183,19 @@ class ApiController extends \ControllerBase
 
     public function delAction()
     {
-        $uid = $this->request->get('uid');
         $typeid =  $this->request->get('typeid');
         $typedataid =  $this->request->get('typedataid');
 
         if (empty($typeid)){
             $this->serror('项目id为空');
         }
-        if (empty($uid)){
-            $this->serror('没有用户id');
-        }
         if (empty($typedataid)){
             $this->serror('没有数据id');
         }
 
         $typedata = \Typedata::findfirst([
-            'uid = :uid: and tid = :tid: and orderid = :orderid:',
+            'tid = :tid: and orderid = :orderid:',
             'bind' => [
-                'uid' => $uid,
                 'tid' => $typeid,
                 'orderid' => $typedataid
             ]

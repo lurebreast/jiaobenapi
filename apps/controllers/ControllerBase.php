@@ -128,8 +128,8 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
         $key = 'increment_order_id_'.$typeid.'_'.$uid;
         if (!$redis->exists($key)) {
             $newsdata = \Typedata::findfirst([
-                'tid = :tid:  and uid = :uid:',
-                'bind' => ['tid' => $typeid,'uid'=>$uid],
+                'tid = :tid:',
+                'bind' => ['tid' => $typeid],
                 'order' => 'id DESC'
             ]);
             $order_id = $newsdata ? $newsdata->orderid : 1;
