@@ -37,6 +37,7 @@ class ApiController extends \ControllerBase
             }
         }
 
+        $og = false;
         if (isset($rand) && $rand == 1){ //随机获取一条数据
             $randnum = mt_rand(1, $this->getOrderId($typeid) - 1);
 
@@ -64,6 +65,8 @@ class ApiController extends \ControllerBase
                     'bind' => ['tid' => $typeid, 'status'=> 1],
                     'order' => 'id DESC'
                 ];
+
+                $og = true;
             }
         }
 
@@ -73,6 +76,14 @@ class ApiController extends \ControllerBase
         } else {
             $newdata->status = 2;
             $newdata->updatetime = time();
+
+            if ($og) { // 添加日志
+                $redis = $this->getRedis();
+                $k = 'user_level1_'.$newdata->tid.$newdata->orderid;
+                $redis->lGet('uid', $newdata->tid.$newdata->orderid) && $redis->lPush('uid', $newdata->tid.$newdata->orderid);
+                $redis->incr($k);
+            }
+
             if ($newdata->save()){
                 $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));
             }else{
