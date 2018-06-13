@@ -80,7 +80,9 @@ class ApiController extends \ControllerBase
             if ($og) { // 添加日志
                 $redis = $this->getRedis();
                 $k = 'user_level1_'.$newdata->tid.$newdata->orderid;
-                $redis->lGet('uid', $newdata->tid.$newdata->orderid) && $redis->lPush('uid', $newdata->tid.$newdata->orderid);
+                if ($redis->lGet('uid', $newdata->tid.$newdata->orderid) === false) {
+                    $redis->lPush('uid', $newdata->tid.$newdata->orderid);
+                }
                 $redis->incr($k);
             }
 

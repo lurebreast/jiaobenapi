@@ -1,4 +1,2 @@
-alter table typedata change img img varchar(255) default '';
-alter table typedata add img1 varchar(255) default '';
-alter table typedata add index idx_tid_oderid(tid, orderid);
-alter table typedata drop index idx_tid;
+
+sort uid by user_level1_* desc get user_level1_*
