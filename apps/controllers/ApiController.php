@@ -12,7 +12,6 @@ class ApiController extends \ControllerBase
         }
 
         if (isset($rand) && $rand == 0) { // 获取单条数据不更新状态
-
             if ($typedataid) {
                 $newdata = \Typedata::findfirst(
                     ['tid = :tid: and orderid = :orderid:',
@@ -20,10 +19,14 @@ class ApiController extends \ControllerBase
                         'order' => 'id DESC']
                 );
             } else {
+                $randnum = mt_rand(1, $this->getOrderId($typeid) - 1);
                 $newdata = \Typedata::findfirst(
-                    ['tid = :tid:',
-                        'bind' => ['tid' => $typeid],
-                        'order' => 'id DESC']
+                    ['tid = :tid: and orderid = :orderid:',
+                        'bind' => [
+                            'tid' => $typeid,
+                            'orderid' => $randnum
+                        ]
+                    ]
                 );
             }
 
@@ -38,26 +41,27 @@ class ApiController extends \ControllerBase
             $randnum = mt_rand(1, $this->getOrderId($typeid) - 1);
 
             $findData = [
-                'tid = :tid: and orderid = :orderid:',
+                'tid = :tid: and orderid = :orderid: and status = :status:',
                 'bind' => [
                     'tid' => $typeid,
-                    'orderid' => $randnum
+                    'orderid' => $randnum,
+                    'status' => 1
                 ]
             ];
         } else {
             if ($typedataid) { // 获取单条数据
                 $findData = [
-                    'tid = :tid: and status = :status: and orderid = :orderid:',
+                    'tid = :tid: and orderid = :orderid: and status = :status:',
                     'bind' => [
                         'tid' => $typeid,
                         'orderid' => $typedataid,
-                        'status' => '1'
+                        'status' => 1
                     ]
                 ];
             } else {
                 $findData =[
                     'tid = :tid: and status = :status:',
-                    'bind' => ['tid' => $typeid, 'status'=>'1'],
+                    'bind' => ['tid' => $typeid, 'status'=> 1],
                     'order' => 'id DESC'
                 ];
             }
@@ -67,7 +71,7 @@ class ApiController extends \ControllerBase
         if (!$newdata) {
             $this->serror('没有可用数据');
         } else {
-            $newdata->status = '2';
+            $newdata->status = 2;
             $newdata->updatetime = time();
             if ($newdata->save()){
                 $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));

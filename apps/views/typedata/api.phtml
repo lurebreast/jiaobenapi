@@ -26,7 +26,8 @@
     <p>2.1、typeid：项目ID；必传；用户端查看</p>
     <p>2.4、typedataid：数据ID；选传</p>
     <p>2.2、rand：
-        <br/>rand:0 提取单条数据：<?=$domain_url?>/api/get?rand=0&typeid=26&typedataid=25814
+        <br/>rand:0, typedataid 提取单条数据：<?=$domain_url?>/api/get?rand=0&typeid=26&typedataid=25814
+        <br/>rand:0 随机提取一条数据：<?=$domain_url?>/api/get?rand=0&typeid=26
         <br/>rand:1 获取随机一条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?rand=1&typeid=26
         <br/>rand:不传, typedataid:不传 获取最新一条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?typeid=26
         <br/>rand:不传, typedataid:83 获取单条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?typeid=26&typedataid=83
