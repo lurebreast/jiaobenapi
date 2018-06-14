@@ -80,8 +80,8 @@ class ApiController extends \ControllerBase
             $newdata->updatetime = time();
 
             if ($unique) { // 添加日志
-                $k = 'user_level1_'.$newdata->tid.$newdata->orderid;
-                $redis->lPush('uid', $newdata->tid.$newdata->orderid);
+                $k = 'user_level2_'.$newdata->tid.$newdata->orderid;
+                $redis->lPush('uid2', $newdata->tid.$newdata->orderid);
                 $redis->incr($k);
             }
             $redis->lRem('tid_orderid_'.$newdata->tid, $newdata->orderid, 2);
