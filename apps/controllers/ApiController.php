@@ -62,13 +62,13 @@ class ApiController extends \ControllerBase
                     ]
                 ];
             } else {
-                $orderid = $redis->rPop('tid_orderid_'.$typeid);
-                if ($orderid) {
-                    $findData =[
-                        'tid = :tid: and orderid = :orderid:',
-                        'bind' => ['tid' => $typeid, 'orderid'=> $orderid],
-                    ];
-                } else {
+//                $orderid = $redis->rPop('tid_orderid_'.$typeid);
+//                if ($orderid) {
+//                    $findData =[
+//                        'tid = :tid: and orderid = :orderid:',
+//                        'bind' => ['tid' => $typeid, 'orderid'=> $orderid],
+//                    ];
+//                } else {
                     $findData =[
                         'tid = :tid: and status = :status:',
                         'bind' => [
@@ -77,7 +77,7 @@ class ApiController extends \ControllerBase
                         ],
                         'order' => 'id desc'
                     ];
-                }
+//                }
 
                 $unique = true;
             }
