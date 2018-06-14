@@ -62,7 +62,7 @@ class ApiController extends \ControllerBase
                     ]
                 ];
             } else {
-                $findData =[
+                $findData = [
                     'tid = :tid: and orderid = :orderid:',
                     'bind' => ['tid' => $typeid, 'orderid'=> $redis->rPop('tid_orderid_'.$typeid)],
                 ];
@@ -84,6 +84,7 @@ class ApiController extends \ControllerBase
                 $redis->lPush('uid', $newdata->tid.$newdata->orderid);
                 $redis->incr($k);
             }
+            $redis->lRem('tid_orderid_'.$newdata->tid, $newdata->orderid, 2);
             $redis->close();
 
             if ($newdata->save()){
