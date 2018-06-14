@@ -137,7 +137,12 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
             $redis->set($key, $order_id);
         }
 
-        return $redis->incr($key);
+        $orderid = $redis->incr($key);
+        $redis->rPush('tid_orderid_'.$typeid, $orderid);
+
+        $redis->close();
+
+        return $orderid;
     }
 
     protected function getRedis()

@@ -77,5 +77,8 @@ function getOrderId($tid)
         $redis->set($key, $orderid);
     }
 
-    return $redis->incr($key);
+    $orderid = $redis->incr($key);
+    $redis->rPush('tid_orderid_'.$tid, $orderid);
+
+    return $orderid;
 }

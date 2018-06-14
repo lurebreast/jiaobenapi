@@ -37,12 +37,14 @@ class ApiController extends \ControllerBase
             }
         }
 
-        $og = false;
+        $redis = $this->getRedis();
+        $unique = false;
         if (isset($rand) && $rand == 1){ //随机获取一条数据
             $randnum = mt_rand(1, $this->getOrderId($typeid) - 1);
+            $less = mt_rand(0, 1) ? true : false;
 
             $findData = [
-                'tid = :tid: and orderid = :orderid: and status = :status:',
+                'tid = :tid: and orderid '.($less ? '<' : '>').' :orderid: and status = :status:',
                 'bind' => [
                     'tid' => $typeid,
                     'orderid' => $randnum,
@@ -60,31 +62,41 @@ class ApiController extends \ControllerBase
                     ]
                 ];
             } else {
-                $findData =[
-                    'tid = :tid: and status = :status:',
-                    'bind' => ['tid' => $typeid, 'status'=> 1],
-                    'order' => 'id DESC'
-                ];
+                $orderid = $redis->rPop('tid_orderid_'.$typeid);
+                if ($orderid) {
+                    $findData =[
+                        'tid = :tid: and orderid = :orderid:',
+                        'bind' => ['tid' => $typeid, 'orderid'=> $orderid],
+                    ];
+                } else {
+                    $findData =[
+                        'tid = :tid: and status = :status:',
+                        'bind' => [
+                            'tid' => $typeid,
+                            'status' => 1
+                        ],
+                        'order' => 'id desc'
+                    ];
+                }
 
-                $og = true;
+                $unique = true;
             }
         }
 
         $newdata = \Typedata::findfirst($findData);
+
         if (!$newdata) {
             $this->serror('没有可用数据');
         } else {
             $newdata->status = 2;
             $newdata->updatetime = time();
 
-            if ($og) { // 添加日志
-                $redis = $this->getRedis();
+            if ($unique) { // 添加日志
                 $k = 'user_level1_'.$newdata->tid.$newdata->orderid;
-                if ($redis->lGet('uid', $newdata->tid.$newdata->orderid) === false) {
-                    $redis->lPush('uid', $newdata->tid.$newdata->orderid);
-                }
+                $redis->lPush('uid', $newdata->tid.$newdata->orderid);
                 $redis->incr($k);
             }
+            $redis->close();
 
             if ($newdata->save()){
                 $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));
