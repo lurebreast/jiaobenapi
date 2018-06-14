@@ -62,22 +62,10 @@ class ApiController extends \ControllerBase
                     ]
                 ];
             } else {
-//                $orderid = $redis->rPop('tid_orderid_'.$typeid);
-//                if ($orderid) {
-//                    $findData =[
-//                        'tid = :tid: and orderid = :orderid:',
-//                        'bind' => ['tid' => $typeid, 'orderid'=> $orderid],
-//                    ];
-//                } else {
-                    $findData =[
-                        'tid = :tid: and status = :status:',
-                        'bind' => [
-                            'tid' => $typeid,
-                            'status' => 1
-                        ],
-                        'order' => 'id desc'
-                    ];
-//                }
+                $findData =[
+                    'tid = :tid: and orderid = :orderid:',
+                    'bind' => ['tid' => $typeid, 'orderid'=> $redis->rPop('tid_orderid_'.$typeid)],
+                ];
 
                 $unique = true;
             }
@@ -96,7 +84,6 @@ class ApiController extends \ControllerBase
                 $redis->lPush('uid', $newdata->tid.$newdata->orderid);
                 $redis->incr($k);
             }
-            $redis->lRem('tid_orderid_'.$newdata->tid, $newdata->orderid, 1000);
             $redis->close();
 
             if ($newdata->save()){
