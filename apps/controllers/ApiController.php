@@ -96,6 +96,7 @@ class ApiController extends \ControllerBase
                 $redis->lPush('uid', $newdata->tid.$newdata->orderid);
                 $redis->incr($k);
             }
+            $redis->lRem('tid_orderid_'.$newdata->tid, $newdata->orderid, 1000);
             $redis->close();
 
             if ($newdata->save()){
