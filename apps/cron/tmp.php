@@ -5,6 +5,8 @@
  * Date: 2018/6/6
  * Time: 16:03
  */
+ini_set("display_errors","On");
+error_reporting(E_ALL);
 
 $redis = new Redis();
 $redis->connect('127.0.0.1');
@@ -23,10 +25,20 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-//构造SQL语句
-$query = "SELECT * FROM  typedata where tid={$tid} order by id desc limit 1";
-//执行SQL语句
 
+//构造SQL语句
+$result = $mysqli->query("select * from type");
+while ($row = $result->fetch_assoc()) {
+
+    $typeid = $row['typeid'];
+    $redis->del('tid_orderid_'.$typeid);
+    echo $typeid."\n";
+}
+
+die;
+
+
+$tid = 19;
 $result = $mysqli->query("select count(*) from typedata where status=1");
 $total = $result->fetch_row()[0];
 
