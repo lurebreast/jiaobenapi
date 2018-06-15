@@ -17,21 +17,25 @@ class TypedataController  extends \ControllerAd{
         ;
         //处理搜索
         $getlist = $this->request->get();
+        $search['orderid_less'] =$getlist['orderid_less'];
         $search['tid'] =$getlist['typeid'];
         $search['status'] =$getlist['status'];
         $search['sttime'] =$getlist['sttime'];
         $search['endtime'] =$getlist['endtime'];
+        if (!empty($search['orderid_less'])){
+            $datalists->andwhere("orderid < '".$search['orderid_less']."'");
+        }
         if (!empty($search['status'])){
-            $datalists-> andwhere("status = '".$search['status']."'");
+            $datalists->andwhere("status = '".$search['status']."'");
         }
         if (!empty($search['tid'])){
-            $datalists-> andwhere("tid = '".$search['tid']."'");
+            $datalists->andwhere("tid = '".$search['tid']."'");
         }
         if (!empty($search['sttime'])){
-            $datalists-> andwhere("creattime >= ".strtotime($search['sttime']));
+            $datalists->andwhere("creattime >= ".strtotime($search['sttime']));
         }
         if (!empty($search['endtime'])){
-            $datalists-> andwhere("creattime < ".strtotime($search['endtime']));
+            $datalists->andwhere("creattime < ".strtotime($search['endtime']));
         }
         $datalists->orderBy('id desc');
         $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
@@ -203,6 +207,7 @@ class TypedataController  extends \ControllerAd{
         set_time_limit(0);
 
         $getlist = $this->request->get();
+        $search['orderid_less'] =$getlist['orderid_less'];
         $search['tid'] =$getlist['typeid'];
         $search['status'] =$getlist['status'];
         $search['sttime'] =$getlist['sttime'];
@@ -215,6 +220,9 @@ class TypedataController  extends \ControllerAd{
         }
 
         $where = "t.tid = '{$search['tid']}'";
+        if (!empty($search['orderid_less'])){
+            $where .= " and orderid < '{$search['orderid_less']}'";
+        }
         if (!empty($search['status'])){
             $where .= " and status = '{$search['status']}'";
         }
@@ -226,6 +234,7 @@ class TypedataController  extends \ControllerAd{
         }
 
         $phql = "SELECT count(*) as total FROM Typedata AS t WHERE $where";
+
         $countnum =  $this->modelsManager->createQuery($phql)->getSingleResult()->total;
 
         $file = '/tmp/data-'.time().'.csv';
