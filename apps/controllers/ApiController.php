@@ -51,6 +51,7 @@ class ApiController extends \ControllerBase
                     'status' => 1
                 ]
             ];
+            $redis->lRem('tid_orderid_'.$typeid, $randnum, 2);
         } else {
             if ($typedataid) { // 获取单条数据
                 $findData = [
@@ -61,6 +62,7 @@ class ApiController extends \ControllerBase
                         'status' => 1
                     ]
                 ];
+                $redis->lRem('tid_orderid_'.$typeid, $typedataid, 2);
             } else {
                 $findData = [
                     'tid = :tid: and orderid = :orderid:',
@@ -83,8 +85,13 @@ class ApiController extends \ControllerBase
                 $k = 'user_level2_'.$newdata->tid.$newdata->orderid;
                 $redis->lPush('uid2', $newdata->tid.$newdata->orderid);
                 $redis->incr($k);
+
+                if ($redis->ttl('uid2') < 0) {
+                    $redis->expire('uid2', 3600);
+                }
+                $redis->expire($k, 3600);
             }
-            $redis->lRem('tid_orderid_'.$newdata->tid, $newdata->orderid, 2);
+
             $redis->close();
 
             if ($newdata->save()){
