@@ -276,7 +276,7 @@ class TypedataController  extends \ControllerAd{
                 $phql = "SELECT t.* FROM Typedata AS t $where $groupBy order by t.id desc limit $limit";
 
             } else {
-                $phql = "SELECT t.* FROM Typedata AS t $where and id < '{$id}' and $groupBy order by t.id desc limit $limit";
+                $phql = "SELECT t.* FROM Typedata AS t $where and id < '{$id}' $groupBy order by t.id desc limit $limit";
             }
 
             $res = $total = $this->modelsManager->createQuery($phql)->execute();
