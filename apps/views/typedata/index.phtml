@@ -23,7 +23,7 @@ $params = $_GET;
 <div class="pd2 cf">
     <h4 class="fl">数据列表</h4>
     <h4 class="fr"><a  onclick="addtype()"  data-toggle="modal" data-target="#myModal" id="data" href="" title="添加项目" class="btn btn-sm btn-success">添加项目</a></h4>
-    <h4 class="fr"><a   href="<?= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['tid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime']).'&orderid_less='.$search['orderid_less'];?>" title="导出" class="btn btn-sm btn-success">导出(最多导出三十万条)</a></h4>
+    <h4 class="fr"><a   href="<?= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['typeid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime']).'&orderid_less='.$search['orderid_less']."&data_unique=".$search['data_unique'];?>" title="导出" class="btn btn-sm btn-success">导出(最多导出三十万条)</a></h4>
 
 </div>
 <form class="navbar-form navbar-left" action="<?= $this->url->get('typedata/index') ?>" method="get" role="form">
@@ -39,11 +39,12 @@ $params = $_GET;
         <select class="form-control" id="typeid" name="typeid"  >
             <option  value="">请选择</option>
             <?php foreach ($type as $ptype): ?>
-                <option  value='<?= $ptype->typeid;?>' <?php if ($search['tid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
+                <option  value='<?= $ptype->typeid;?>' <?php if ($search['typeid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
             <?php endforeach; ?>
         </select>
         上传时间：<input id="sttime"  class="form-control" name="sttime"  placeholder="开始日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['sttime'];?>">
-        -<input id="endtime"  class="form-control" name="endtime"  placeholder="结束日期"　data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['endtime'];?>">
+        -<input id="endtime" class="form-control" name="endtime"  placeholder="结束日期"　data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['endtime'];?>">
+        数据去重<input name='data_unique' type="checkbox" <? if (!empty($search['data_unique'])) echo 'checked'?> value="1"/>
         <button type="submit" class="btn btn-flat btn-success">搜索</button>
     </div>
 </form>

@@ -1,4 +1,6 @@
 <?php
+use \Phalcon\Paginator\Adapter\Sql as PaginatorSql;
+use Phalcon\Mvc\Model\Resultset\Simple as Resultset;
 
 class TypedataController  extends \ControllerAd{
 
@@ -12,37 +14,40 @@ class TypedataController  extends \ControllerAd{
             $typearrs[$v->typeid] = $v->typename;
         }
         $this->view->setVar("typearrs", $typearrs);
-        $datalists = $this->modelsManager->createBuilder()
-            ->from('Typedata')
-        ;
         //处理搜索
-        $getlist = $this->request->get();
-        $search['orderid_less'] =$getlist['orderid_less'];
-        $search['tid'] =$getlist['typeid'];
-        $search['status'] =$getlist['status'];
-        $search['sttime'] =$getlist['sttime'];
-        $search['endtime'] =$getlist['endtime'];
+        $search = $this->request->get();
+        $where = 'where 1';
         if (!empty($search['orderid_less'])){
-            $datalists->andwhere("orderid < '".$search['orderid_less']."'");
+            $where .= ' and orderid <'.$search['orderid_less'];
         }
         if (!empty($search['status'])){
-            $datalists->andwhere("status = '".$search['status']."'");
+            $where .= ' and status ='.$search['status'];
         }
-        if (!empty($search['tid'])){
-            $datalists->andwhere("tid = '".$search['tid']."'");
+        if (!empty($search['typeid'])){
+            $where .= ' and tid ='.$search['typeid'];
         }
         if (!empty($search['sttime'])){
-            $datalists->andwhere("creattime >= ".strtotime($search['sttime']));
+            $where .= " and creattime >= ".strtotime($search['sttime']);
         }
         if (!empty($search['endtime'])){
-            $datalists->andwhere("creattime < ".strtotime($search['endtime']));
+            $where .= " and creattime < ".strtotime($search['endtime']);
         }
-        $datalists->orderBy('id desc');
-        $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
-            "builder" => $datalists,
-            "limit" => 30,
-            "page" => $page
-        ));
+        if (!empty($search['data_unique'])){
+            $sql = "SELECT * FROM typedata $where GROUP BY data order by id desc LIMIT :limit OFFSET :offset";
+            $totalSql = "SELECT COUNT(DISTINCT(data)) rowcount FROM typedata $where";
+        } else {
+            $sql = "SELECT * FROM typedata $where order by id desc LIMIT :limit OFFSET :offset";
+            $totalSql = "SELECT COUNT(*) rowcount FROM typedata $where";
+        }
+
+        $paginator = new PaginatorSql(
+            array(
+                "sql" => $sql,
+                "total_sql" => $totalSql,
+                "limit"   => 30,
+                "page"    => $page
+            )
+        );
 
         $this->view->setVar("page", $paginator->getPaginate());
         $this->view->setVar("search", $search);
@@ -206,36 +211,38 @@ class TypedataController  extends \ControllerAd{
     public function outdataAction(){
         set_time_limit(0);
 
-        $getlist = $this->request->get();
-        $search['orderid_less'] =$getlist['orderid_less'];
-        $search['tid'] =$getlist['typeid'];
-        $search['status'] =$getlist['status'];
-        $search['sttime'] =$getlist['sttime'];
-        $search['endtime'] =$getlist['endtime'];
+        $search = $this->request->get();
 
-        if (empty($search['tid'])) {
+        if (empty($search['typeid'])) {
             $this->flashSession->error('必须选择一个项目');
             header('Location:/typedata/index');
             die;
         }
 
-        $where = "t.tid = '{$search['tid']}'";
+        $where = " where t.tid = {$search['typeid']}";
+        $groupBy = '';
         if (!empty($search['orderid_less'])){
-            $where .= " and orderid < '{$search['orderid_less']}'";
+            $where .= " and t.orderid < {$search['orderid_less']}";
         }
         if (!empty($search['status'])){
-            $where .= " and status = '{$search['status']}'";
+            $where .= " and t.status = {$search['status']}";
         }
         if (!empty($search['sttime'])){
-            $where .= " and t.creattime >= '".strtotime($search['sttime'])."'";
+            $where .= " and t.creattime >= ".strtotime($search['sttime']);
         }
         if (!empty($search['endtime'])){
-            $where .= " and t.creattime < '".strtotime($search['endtime'])."'";
+            $where .= " and t.creattime < ".strtotime($search['endtime']);
+        }
+        if (!empty($search['data_unique'])){
+            $groupBy = ' group by t.data';
+            $sql = "SELECT COUNT(DISTINCT(t.data)) total FROM typedata t $where";
+        } else {
+            $sql = "SELECT count(*) as total FROM Typedata AS t WHERE $where";
+
         }
 
-        $phql = "SELECT count(*) as total FROM Typedata AS t WHERE $where";
-
-        $countnum =  $this->modelsManager->createQuery($phql)->getSingleResult()->total;
+        $typedata = new \Typedata();
+        $countnum =  (new Resultset(null, $typedata, $typedata->getReadConnection()->query($sql, null)))->getFirst()->total;
 
         $file = '/tmp/data-'.time().'.csv';
 
@@ -266,10 +273,10 @@ class TypedataController  extends \ControllerAd{
 
             $first = $i == 1;
             if ($first) {
-                $phql = "SELECT t.* FROM Typedata AS t WHERE $where order by id desc limit $limit";
+                $phql = "SELECT t.* FROM Typedata AS t $where $groupBy order by t.id desc limit $limit";
 
             } else {
-                $phql = "SELECT t.* FROM Typedata AS t WHERE id < '{$id}' and $where order by id desc limit $limit";
+                $phql = "SELECT t.* FROM Typedata AS t id < '{$id}' and $where $groupBy order by t.id desc limit $limit";
             }
 
             $res = $total = $this->modelsManager->createQuery($phql)->execute();
