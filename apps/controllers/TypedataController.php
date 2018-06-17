@@ -237,7 +237,7 @@ class TypedataController  extends \ControllerAd{
             $groupBy = ' group by t.data';
             $sql = "SELECT COUNT(DISTINCT(t.data)) total FROM typedata t $where";
         } else {
-            $sql = "SELECT count(*) as total FROM Typedata AS t WHERE $where";
+            $sql = "SELECT count(*) as total FROM typedata AS t $where";
 
         }
 
