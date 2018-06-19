@@ -268,7 +268,7 @@ class TypedataController  extends \ControllerAd{
 
         $limit = 1000;
         $pages = ceil($countnum / $limit);
-        $pages > 300 && $pages = 300; // 最多取三十万条数据
+        $pages > 200 && $pages = 200; // 最多取二十万条数据
         for ($i = 1; $i <= $pages; $i++) {
 
             $first = $i == 1;
