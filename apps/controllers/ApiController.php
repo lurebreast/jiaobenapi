@@ -136,20 +136,27 @@ class ApiController extends \ControllerBase
             $imgBase64 = str_replace('data:image/png;base64,', '', $imgBase64);
             $imgBin = base64_decode($imgBase64);
 
-            $basePath = $_SERVER['DOCUMENT_ROOT'];
-            $img = '/images/'.md5(time().mt_rand(1, 10000)).'.png';
-            file_put_contents($basePath.$img, $imgBin);
-            unset($imgBin);
+            if ($imgBin) {
+                $basePath = $_SERVER['DOCUMENT_ROOT'];
+                $img = '/images/'.md5(time().mt_rand(1, 10000)).'.png';
+                file_put_contents($basePath.$img, $imgBin);
+                unset($imgBin);
+            } else {
+                file_put_contents('/tmp/img_upload.txt', date('Y-m-d H:i:s').' '.$typeid.' '.$this->request->get('img')."\n", FILE_APPEND);
+            }
         }
         if ($imgBase641) {
             $imgBase641 = str_replace(' ', '+', $imgBase641);
             $imgBase641 = str_replace('data:image/png;base64,', '', $imgBase641);
             $imgBin = base64_decode($imgBase641);
-
-            $basePath = $_SERVER['DOCUMENT_ROOT'];
-            $img1 = '/images/'.md5(time().mt_rand(1, 10000)).'.png';
-            file_put_contents($basePath.$img1, $imgBin);
-            unset($imgBin);
+            if ($imgBin) {
+                $basePath = $_SERVER['DOCUMENT_ROOT'];
+                $img1 = '/images/'.md5(time().mt_rand(1, 10000)).'.png';
+                file_put_contents($basePath.$img1, $imgBin);
+                unset($imgBin);
+            } else {
+                file_put_contents('/tmp/img_upload.txt', date('Y-m-d H:i:s').' '.$typeid.' '.$this->request->get('img1')."\n", FILE_APPEND);
+            }
         }
 
         $typedata = \Typedata::findfirst([
