@@ -55,9 +55,13 @@ class TypedataController  extends \ControllerAd{
     public function typeaddAction(){
         $this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
         if ($this->request->isPost() && $this->security->checkToken()) {
+            $timestamp = time();
             $typename=$this->request->getPost('typename');
             $type = new Type();
             $type->typename = $typename;
+            $type->createtime = $timestamp;
+            $type->updatetime = $timestamp;
+
             if ($type->save()){
                 $this->flashSession->success('添加成功');
             }else{
@@ -149,6 +153,7 @@ class TypedataController  extends \ControllerAd{
                     Throw new \Exception('项目不能为空！');
                 }
                 $types->typename = $typename;
+                $types->updatetime = time();
                 if ($types->save()){
                     $this->flashSession->success('保存成功');
                 }else{
