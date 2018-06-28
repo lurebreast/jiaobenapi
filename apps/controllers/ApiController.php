@@ -185,24 +185,26 @@ class ApiController extends \ControllerBase
         $redis = $this->getRedis();
         $key = 'typeid_count_'.$typeid.'_'.$status;
 
-        if ($countnum = $redis->get($key)) {
-            $this->ssussess($countnum);
+        if ($redis->setnx($key.'_lock', true)) {
+            $redis->expire($key.'_lock', 60);
+
+            if (!empty($status)){
+                $countnum = \Typedata::count([
+                    'tid = :tid: and status = :status:',
+                    'bind' => ['tid' => $typeid,'status'=>$status]
+                ]);
+            }else{
+                $countnum = \Typedata::count([
+                    'tid = :tid:',
+                    'bind' => ['tid' => $typeid]
+                ]);
+            }
+
+            $redis->setex($key, 86400, $countnum);
+        } else {
+            $countnum = $redis->get($key);
         }
 
-
-        if (!empty($status)){
-            $countnum = \Typedata::count([
-                'tid = :tid: and status = :status:',
-                'bind' => ['tid' => $typeid,'status'=>$status]
-            ]);
-        }else{
-            $countnum = \Typedata::count([
-                'tid = :tid:',
-                'bind' => ['tid' => $typeid]
-            ]);
-        }
-
-        $redis->setex($key, 60, $countnum);
         $this->ssussess($countnum);
     }
 
