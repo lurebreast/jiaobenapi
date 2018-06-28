@@ -103,6 +103,11 @@ class ApiController extends \ControllerBase
         if (empty($typeid)){
             $this->serror('项目id或者数据为空');
         }
+
+        if (!\Type::findfirst($typeid)) {
+            $this->serror('没有此项目');
+        }
+
         if ($only == '1'){
             $newsdata = \Typedata::findfirst([
                 'tid = :tid: and data = :data:',
