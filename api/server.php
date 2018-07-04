@@ -4,7 +4,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . "config.php";
 $http = new swoole_http_server("127.0.0.1", 9501);
 
 $http->set(array(
-    'daemonize' => 0,
+    'daemonize' => 1,
     'worker_num' => 2,
     'max_request' => 500,
     'dispatch_mode' => 1,
