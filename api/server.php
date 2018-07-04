@@ -8,6 +8,8 @@ $http->set(array(
     'worker_num' => 2,
     'max_request' => 500,
     'dispatch_mode' => 1,
+    'group' => 'www',
+    'user' => 'www',
 ));
 $http->on("start", function ($server) {
     echo "Swoole http server is started at http://127.0.0.1:9501\n";
