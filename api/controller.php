@@ -101,8 +101,8 @@ function uploadImg($base64_img, $tid, $orderid, $img_id)
  */
 function action_getCount($request)
 {
-    $typeid = $request->get['typeid'] ?: 0;
-    $status = $request->get['status'] ?: null;
+    $typeid = isset($request->get['typeid']) ? $request->get['typeid'] : 0;
+    $status = isset($request->get['status']) ? $request->get['status'] : null;
 
     if (!$typeid) {
         return error('项目id为空');
