@@ -5,7 +5,7 @@ $http = new swoole_http_server("127.0.0.1", 9501);
 
 $http->set(array(
     'daemonize' => 1,
-    'worker_num' => 2,
+    'worker_num' => 4,
     'max_request' => 500,
     'dispatch_mode' => 1,
 ));
