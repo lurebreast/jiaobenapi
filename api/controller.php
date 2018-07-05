@@ -88,7 +88,7 @@ function uploadImg($base64_img, $tid, $orderid, $img_id)
             file_put_contents($basePath.$img, $imgBin);
             unset($imgBin);
         } else {
-            file_put_contents('/tmp/img_upload.txt', date('Y-m-d H:i:s').' '.$tid.' '.$this->request->get('img')."\n", FILE_APPEND);
+            //file_put_contents('/tmp/img_upload.txt', date('Y-m-d H:i:s').' '.$tid.' '.$this->request->get('img')."\n", FILE_APPEND);
         }
     }
 
