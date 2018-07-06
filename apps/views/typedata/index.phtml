@@ -61,6 +61,7 @@ $params = $_GET;
     <thead>
     <tr>
         <td class="text-left"><input type="checkbox" onclick="selectAll(this)" />全选</td>
+        <th>id</th>
         <th>序号</th>
         <th >提取</th>
         <th>项目id</th>
@@ -77,6 +78,7 @@ $params = $_GET;
     <?php foreach ($page->items as $item): ?>
         <tr>
             <td class="text-left"><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
+            <td><?= $item->id;?></td>
             <td><?= $item->orderid;?></td>
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <td><?= $item->tid;?></td>
