@@ -52,6 +52,29 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("page", $paginator->getPaginate());
         $this->view->setVar("search", $search);
     }
+
+    public function moveTypedataAction()
+    {
+        $ids = $this->request->get('ids');
+        $type = $this->request->get('type');
+
+
+        $ids = array_filter(explode(',', $ids));
+        $ids = implode(',', $ids);
+        if (empty($ids)){
+            Throw new \Exception('id为空！');
+        }
+
+        if ($type == 'del') {
+            $phql = "DELETE FROM typedata WHERE id in($ids)";
+        } elseif ($type == 'recycle') {
+            $phql = "UPDATE typedata SET tid=1, updatetime=".time()." WHERE id in($ids)";
+        }
+
+        $typedata = new \Typedata();
+        $typedata->getWriteConnection()->query($phql, null);
+        header("Location:".$_SERVER['HTTP_REFERER']);
+    }
     public function typeaddAction(){
         $this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
         if ($this->request->isPost() && $this->security->checkToken()) {
@@ -167,6 +190,29 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("types", $types);
         $this->view->setVar("typeid", $typeid);
     }
+
+    public function deldataAction(){
+        $typeid = $this->request->get('id');
+        $typeid = intval($typeid);
+        try {
+            if (empty($typeid)){
+                Throw new \Exception('id为空！');
+            }
+            $types = \Typedata::findfirst($typeid);
+            $tid = $types->tid;
+            if (empty($types)){
+                Throw new \Exception('没有该项目！');
+            }
+            if ($types->delete()){
+                $this->flashSession->success('删除成功');
+            }else{
+                Throw new \Exception('删除失败！');
+            }
+        }catch (\Exception $e){
+            $this->flashSession->error($e->getMessage());
+        }
+        $this->response->redirect('typedata/index?typeid='.$tid);
+    }
     /**
      * 清空数据
      */
@@ -191,8 +237,9 @@ class TypedataController  extends \ControllerAd{
         $this->response->redirect('typedata/typead');
 
     }
-    public function deldataAction(){
-        $typeid = $this->request->get('id');
+
+    public function recycledataAction(){
+        $typeid = $this->request->get('typeid');
         $typeid = intval($typeid);
         try {
             if (empty($typeid)){
@@ -203,16 +250,23 @@ class TypedataController  extends \ControllerAd{
             if (empty($types)){
                 Throw new \Exception('没有该项目！');
             }
-            if ($types->delete()){
-                $this->flashSession->success('删除成功');
+
+            $phql = "UPDATE Typedata SET tid=1 WHERE tid = ".$typeid;
+            $query = $this->modelsManager->createQuery($phql);
+            $query->execute();
+
+            if ($query->execute()){
+                $this->flashSession->success('操作成功');
             }else{
-                Throw new \Exception('删除失败！');
+                Throw new \Exception('操作失败！');
             }
         }catch (\Exception $e){
             $this->flashSession->error($e->getMessage());
         }
         $this->response->redirect('typedata/index?typeid='.$tid);
     }
+
+
     public function outdataAction(){
         set_time_limit(0);
 

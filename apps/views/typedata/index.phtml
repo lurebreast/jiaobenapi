@@ -9,15 +9,24 @@ $params = $_GET;
         $("#mymodel").html(htmlobj1.responseText);
     }
 
-    $(document).on('click', '.delete', function(data) {
-        $self = $(this);
-        var r=confirm('删除项目');
-        if (r==true)
-        {
-            window.location=$self.attr('data-url');
-        }
-        return ;
-    });
+    function selectAll(o) {
+        $("input:checkbox[name=ids]").each(function(){
+            this.checked = o.checked;
+        });
+
+        return false;
+    }
+
+    function moveTypedata(type) {
+        var ids = '';
+        $("input:checkbox[name=ids]").each(function(index){
+            if (this.checked) {
+                ids += this.value + ',';
+            }
+        });
+
+        window.location.href = "<?= $this->url->get('typedata/moveTypedata?ids=') ?>" + ids + '&type=' + type;
+    }
 </script>
 <script language="javascript" type="text/javascript" src="/static/js/My97DatePicker/WdatePicker.js"></script>
 <div class="pd2 cf">
@@ -51,6 +60,7 @@ $params = $_GET;
 <table class="table table-bordered text-center table-hover">
     <thead>
     <tr>
+        <td class="text-left"><input type="checkbox" onclick="selectAll(this)" />全选</td>
         <th>序号</th>
         <th >提取</th>
         <th>项目id</th>
@@ -66,6 +76,7 @@ $params = $_GET;
     <tbody>
     <?php foreach ($page->items as $item): ?>
         <tr>
+            <td class="text-left"><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
             <td><?= $item->orderid;?></td>
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <td><?= $item->tid;?></td>
@@ -75,12 +86,21 @@ $params = $_GET;
             <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
             <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
             <td><?= $item->data;?></td>
-            <td><a data-url="<?= $this->url->get('typedata/deldata?id='.$item->id) ?>"  class="btn btn-sm btn-danger delete">删除</a></td>
+            <td>
+                <?php if ($this->session->uid == 2):?>
+                <a href="<?= $this->url->get('typedata/moveTypedata?ids='.$item->id.'&type=del') ?>" class="btn btn-sm btn-danger delete">删除</a>
+                <?php endif;?>
+                <a href="<?= $this->url->get('typedata/moveTypedata?ids='.$item->id.'&type=recycle') ?>" class="btn btn-sm btn-danger delete">移至回收站</a>
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
 </table>
 <?php $this->partial("common/pages", array('url' => 'typedata/index?page=', 'page' => $page)) ?>
+<div>
+    <button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button>
+    <button class="btn btn-sm btn-danger delete" onclick="moveTypedata('recycle');">移至回收站</button>
+</div>
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">

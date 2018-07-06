@@ -59,8 +59,12 @@
             <td><?= $item->typename;?></td>
             <td><?if ($item->createtime){echo date('Y-m-d H:i:s',$item->createtime);}?></td>
             <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
-            <td><a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
-                <a href="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">清除数据</a>
+            <td>
+                <?php if ($this->session->uid == 2):?>
+                    <a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
+                    <a href="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">清除数据</a>
+                <?php endif;?>
+                <a href="<?= $this->url->get('typedata/recycledata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">移至回收站</a>
                 <a  onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" class="btn btn-sm btn-success">修改</a>
             </td>
         </tr>
