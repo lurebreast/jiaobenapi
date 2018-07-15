@@ -1,2 +1,2 @@
-
-sort uid by user_level1_* desc get user_level1_*
+create table typedata_recycle like typedata;
+alter table type add is_delete tinyint(2) default 1;

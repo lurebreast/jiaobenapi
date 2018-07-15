@@ -85,7 +85,19 @@ function uploadImg($base64_img, $tid, $orderid, $img_id)
         if ($imgBin = base64_decode($base64_img)) {
             $basePath = '/home/wwwroot/default/public';
             $img = "/images/{$tid}_{$orderid}_{$img_id}.png";
-            file_put_contents($basePath.$img, $imgBin);
+
+            $img_src = $basePath.$img;
+            file_put_contents($img_src, $imgBin);
+            list($width,$height,$type) = getimagesize($img_src);
+            $new_width = $width*0.6;
+            $new_height =$height*0.6;
+
+            $image_wp=imagecreatetruecolor($new_width, $new_height);
+            $image = imagecreatefrompng($img_src);
+            imagecopyresampled($image_wp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+            imagejpeg($image_wp, $img_src,75);
+            imagedestroy($image_wp);
+
             unset($imgBin);
         } else {
             //file_put_contents('/tmp/img_upload.txt', date('Y-m-d H:i:s').' '.$tid.' '.$this->request->get('img')."\n", FILE_APPEND);
@@ -93,6 +105,46 @@ function uploadImg($base64_img, $tid, $orderid, $img_id)
     }
 
     return $img;
+}
+
+/**
+ * desription 压缩图片
+ * @param sting $imgsrc 图片路径
+ * @param string $imgdst 压缩后保存路径
+ */
+function image_png_size_add($imgsrc,$imgdst){
+    list($width,$height,$type)=getimagesize($imgsrc);
+    $new_width = $width*0.6;
+    $new_height =$height*0.6;
+    switch($type){
+        case 1:
+            $giftype=check_gifcartoon($imgsrc);
+            if($giftype){
+                header('Content-Type:image/gif');
+                $image_wp=imagecreatetruecolor($new_width, $new_height);
+                $image = imagecreatefromgif($imgsrc);
+                imagecopyresampled($image_wp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                imagejpeg($image_wp, $imgdst,75);
+                imagedestroy($image_wp);
+            }
+            break;
+        case 2:
+            header('Content-Type:image/jpeg');
+            $image_wp=imagecreatetruecolor($new_width, $new_height);
+            $image = imagecreatefromjpeg($imgsrc);
+            imagecopyresampled($image_wp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+            imagejpeg($image_wp, $imgdst,75);
+            imagedestroy($image_wp);
+            break;
+        case 3:
+            header('Content-Type:image/png');
+            $image_wp=imagecreatetruecolor($new_width, $new_height);
+            $image = imagecreatefrompng($imgsrc);
+            imagecopyresampled($image_wp, $image, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+            imagejpeg($image_wp, $imgdst,75);
+            imagedestroy($image_wp);
+            break;
+    }
 }
 
 /**

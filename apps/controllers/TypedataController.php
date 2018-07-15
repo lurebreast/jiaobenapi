@@ -7,7 +7,9 @@ class TypedataController  extends \ControllerAd{
     public function indexAction(){
 
         $page = $this->request->get('page', 'int', 1);
-        $typearr = \Type::find();
+        $target = $this->request->get('target', 'string', 'index');
+        $typearr = $target == 'recycle' ? \Type::Find('is_delete = 1') : \Type::find('is_delete = 0');
+
         $this->view->setVar("type", $typearr);
         $typearrs = array();
         foreach ($typearr as $v){
@@ -32,12 +34,14 @@ class TypedataController  extends \ControllerAd{
         if (!empty($search['endtime'])){
             $where .= " and creattime < ".strtotime($search['endtime']);
         }
+
+        $table = $target == 'recycle' ? 'typedata_recycle' : 'typedata';
         if (!empty($search['data_unique'])){
-            $sql = "SELECT * FROM typedata $where GROUP BY data order by id desc LIMIT :limit OFFSET :offset";
-            $totalSql = "SELECT COUNT(DISTINCT(data)) rowcount FROM typedata $where";
+            $sql = "SELECT * FROM $table $where GROUP BY data order by id desc LIMIT :limit OFFSET :offset";
+            $totalSql = "SELECT COUNT(DISTINCT(data)) rowcount FROM $table $where";
         } else {
-            $sql = "SELECT * FROM typedata $where order by id desc LIMIT :limit OFFSET :offset";
-            $totalSql = "SELECT COUNT(*) rowcount FROM typedata $where";
+            $sql = "SELECT * FROM $table $where order by id desc LIMIT :limit OFFSET :offset";
+            $totalSql = "SELECT COUNT(*) rowcount FROM $table $where";
         }
 
         $paginator = new PaginatorSql(
@@ -51,6 +55,7 @@ class TypedataController  extends \ControllerAd{
 
         $this->view->setVar("page", $paginator->getPaginate());
         $this->view->setVar("search", $search);
+        $this->view->setVar("target", $target);
     }
 
     public function moveTypedataAction()
@@ -65,31 +70,38 @@ class TypedataController  extends \ControllerAd{
             Throw new \Exception('id为空！');
         }
 
-        if ($type == 'del') {
-            $phql = "DELETE FROM typedata WHERE id in($ids)";
-        } elseif ($type == 'recycle') {
-            $phql = "UPDATE typedata SET tid=1, updatetime=".time()." WHERE id in($ids)";
+        $typedata = new \Typedata();
+        $con = $typedata->getWriteConnection();
+        if ($type == 'recycle') {
+            $phql = "insert into typedata_recycle select * from typedata where id in($ids)";
+            $con->query($phql);
         }
 
-        $typedata = new \Typedata();
-        $typedata->getWriteConnection()->query($phql, null);
+        $con->query("DELETE FROM typedata WHERE id in($ids)", null);
         header("Location:".$_SERVER['HTTP_REFERER']);
     }
     public function typeaddAction(){
         $this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
-        if ($this->request->isPost() && $this->security->checkToken()) {
-            $timestamp = time();
-            $typename=$this->request->getPost('typename');
-            $type = new Type();
-            $type->typename = $typename;
-            $type->createtime = $timestamp;
-            $type->updatetime = $timestamp;
+        $timestamp = time();
+        $typename=$this->request->getPost('typename');
 
-            if ($type->save()){
-                $this->flashSession->success('添加成功');
-            }else{
-                $this->flashSession->error('添加失败');
+        if ($this->request->isPost() && $this->security->checkToken()) {
+
+            if (\Type::findFirst("typename='".addslashes($typename)."'")) {
+                $this->flashSession->success('此项目已存在');
+            } else {
+                $type = new Type();
+                $type->typename = $typename;
+                $type->createtime = $timestamp;
+                $type->updatetime = $timestamp;
+
+                if ($type->save()){
+                    $this->flashSession->success('添加成功');
+                }else{
+                    $this->flashSession->error('添加失败');
+                }
             }
+
             $this->response->redirect('typedata/index');
         }
     }
@@ -101,7 +113,7 @@ class TypedataController  extends \ControllerAd{
         $typeid = intval($typeid);
 
         $exce = false;
-        $typearr = \Type::find();
+        $typearr = \Type::find('is_delete = 0');
         $this->view->setVar("type", $typearr);
         if ($this->request->isPost() && $this->security->checkToken()) {
             try {
@@ -238,32 +250,26 @@ class TypedataController  extends \ControllerAd{
 
     }
 
-    public function recycledataAction(){
+    public function recycletypeAction(){
         $typeid = $this->request->get('typeid');
         $typeid = intval($typeid);
         try {
             if (empty($typeid)){
                 Throw new \Exception('id为空！');
             }
-            $types = \Typedata::findfirst($typeid);
-            $tid = $types->tid;
-            if (empty($types)){
-                Throw new \Exception('没有该项目！');
-            }
 
-            $phql = "UPDATE Typedata SET tid=1 WHERE tid = ".$typeid;
-            $query = $this->modelsManager->createQuery($phql);
-            $query->execute();
+            $typedata = new \Typedata();
+            $con = $typedata->getWriteConnection();
 
-            if ($query->execute()){
-                $this->flashSession->success('操作成功');
-            }else{
-                Throw new \Exception('操作失败！');
-            }
+            $con->query("UPDATE type SET is_delete = 1, updatetime=".time()." WHERE typeid = ".$typeid);
+            $con->query("insert into typedata_recycle select * from typedata where tid=$typeid");
+            $con->query("delete from typedata where tid=$typeid");
+
+            $this->flashSession->success('操作成功');
         }catch (\Exception $e){
             $this->flashSession->error($e->getMessage());
         }
-        $this->response->redirect('typedata/index?typeid='.$tid);
+        $this->response->redirect('typedata/typead');
     }
 
 
@@ -277,6 +283,9 @@ class TypedataController  extends \ControllerAd{
             header('Location:/typedata/index');
             die;
         }
+
+        $table = $search['target'] == 'recycle' ? "typedata_recycle" : 'typedata';
+        $table1 = $search['target'] == 'recycle' ? "TypedataRecycle" : 'Typedata';
 
         $where = " where t.tid = {$search['typeid']}";
         $groupBy = '';
@@ -294,9 +303,9 @@ class TypedataController  extends \ControllerAd{
         }
         if (!empty($search['data_unique'])){
             $groupBy = ' group by t.data';
-            $sql = "SELECT COUNT(DISTINCT(t.data)) total FROM typedata t $where";
+            $sql = "SELECT COUNT(DISTINCT(t.data)) total FROM $table t $where";
         } else {
-            $sql = "SELECT count(*) as total FROM typedata AS t $where";
+            $sql = "SELECT count(*) as total FROM $table AS t $where";
 
         }
 
@@ -332,10 +341,10 @@ class TypedataController  extends \ControllerAd{
 
             $first = $i == 1;
             if ($first) {
-                $phql = "SELECT t.* FROM Typedata AS t $where $groupBy order by t.id desc limit $limit";
+                $phql = "SELECT t.* FROM $table1 AS t $where $groupBy order by t.id desc limit $limit";
 
             } else {
-                $phql = "SELECT t.* FROM Typedata AS t $where and id < '{$id}' $groupBy order by t.id desc limit $limit";
+                $phql = "SELECT t.* FROM $table1 AS t $where and id < '{$id}' $groupBy order by t.id desc limit $limit";
             }
 
             $res = $total = $this->modelsManager->createQuery($phql)->execute();
