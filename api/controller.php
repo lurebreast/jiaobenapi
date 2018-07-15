@@ -26,8 +26,8 @@ function action_set($request)
     $mysqli = getMysqli();
 
     $type = $mysqli->query("select id from type where tid='{$tid}'");
-    if ($type && !$type->fetch_assoc()) {
-        $type->free();
+    if (!$type) {
+        $type && $type->free();
         $mysqli->close();
         return error('没有此项目');
     }
