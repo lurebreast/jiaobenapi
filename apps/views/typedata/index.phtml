@@ -61,24 +61,24 @@ $params = $_GET;
 <table class="table table-bordered text-left table-hover">
     <thead>
     <tr>
-        <td class="text-left"><input type="checkbox" onclick="selectAll(this)" />全选</td>
-        <th>id</th>
-        <th>序号</th>
-        <th >提取</th>
-        <th>项目id</th>
-        <th>项目名称</th>
-        <th>图片</th>
-        <th>图片1</th>
-        <th>上传时间</th>
-        <th>更新时间</th>
+        <td width="64"><input type="checkbox" onclick="selectAll(this)" />全选</td>
+        <th width="64">id</th>
+        <th width="64">序号</th>
+        <th width="64" >提取</th>
+        <th width="64">项目id</th>
+        <th width="74">项目名称</th>
+        <th width="64">图片</th>
+        <th width="64">图片1</th>
+        <th width="100">上传时间</th>
+        <th width="100">更新时间</th>
         <th>数据</th>
-        <th>操作</th>
+        <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>
     </tr>
     </thead>
     <tbody>
     <?php foreach ($page->items as $item): ?>
         <tr>
-            <td class="text-left"><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
+            <td><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
             <td><?= $item->id;?></td>
             <td><?= $item->orderid;?></td>
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
@@ -99,9 +99,6 @@ $params = $_GET;
     </tbody>
 </table>
 <?php $this->partial("common/pages", array('url' => 'typedata/index?page=', 'page' => $page)) ?>
-<div>
-    <button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button>
-</div>
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">

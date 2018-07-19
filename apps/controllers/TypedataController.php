@@ -78,6 +78,7 @@ class TypedataController  extends \ControllerAd{
         }
 
         $con->query("DELETE FROM typedata WHERE id in($ids)", null);
+        $con->query("DELETE FROM typedata_recycle WHERE id in($ids)", null);
         header("Location:".$_SERVER['HTTP_REFERER']);
     }
     public function typeaddAction(){
@@ -161,9 +162,8 @@ class TypedataController  extends \ControllerAd{
             $id = intval($id);
             if ($id && $types = \Type::findfirst(intval($id))) {
                 if ($types->delete()){
-                    $phql = "DELETE FROM Typedata WHERE tid = ".$id;
-                    $query = $this->modelsManager->createQuery($phql);
-                    $query->execute();
+                    $this->modelsManager->createQuery("DELETE FROM Typedata WHERE tid = {$id}")->execute();
+                    $this->modelsManager->createQuery("DELETE FROM TypedataRecycle WHERE tid = {$id}")->execute();
                     $typename .= $types->typename.',';
                 }
             }
@@ -236,9 +236,8 @@ class TypedataController  extends \ControllerAd{
         foreach ($typeid as $id) {
             $id = intval($id);
             if ($id && $types = \Type::findfirst($id)) {
-                $phql = "DELETE FROM Typedata WHERE tid = ".$id;
-                $query = $this->modelsManager->createQuery($phql);
-                $query->execute();
+                $this->modelsManager->createQuery("DELETE FROM Typedata WHERE tid = {$id}")->execute();
+                $this->modelsManager->createQuery("DELETE FROM TypedataRecycle WHERE tid = {$id}")->execute();
                 $typename .= $types->typename.',';
             }
         }
