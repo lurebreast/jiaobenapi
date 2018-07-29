@@ -62,11 +62,6 @@ $action = $this->dispatcher->getActionName();
                             <i class="fa fa-angle-double-right" aria-hidden="true"></i>数据列表
                         </a>
                     </li>
-                    <li class="<?php if($controller=='typedata'&& $action=='index' && $target == 'recycle'):?>active<?php endif;?> first">
-                        <a href="<?= $this->url->get('typedata/index').'?target=recycle' ?>">
-                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>回收站
-                        </a>
-                    </li>
                     <li class="<?php if($controller=='typedata'&& $action=='dataadd'):?>active<?php endif;?> first">
                         <a href="<?= $this->url->get('typedata/dataadd') ?>">
                             <i class="fa fa-angle-double-right" aria-hidden="true"></i>上传数据
@@ -77,9 +72,14 @@ $action = $this->dispatcher->getActionName();
                             <i class="fa fa-angle-double-right" aria-hidden="true"></i>接口说明
                         </a>
                     </li>
-                    <li class="<?php if($controller=='typedata'&& $action=='typead'):?>active<?php endif;?> first">
+                    <li class="<?php if($controller=='typedata'&& $action=='typead'  && empty($_GET['recycle'])):?>active<?php endif;?> first">
                         <a href="<?= $this->url->get('typedata/typead') ?>">
                             <i class="fa fa-angle-double-right" aria-hidden="true"></i>项目管理
+                        </a>
+                    </li>
+                    <li class="<?php if($controller=='typedata'&& $action=='typead' && !empty($_GET['recycle'])):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('typedata/typead').'?recycle=1' ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>项目管理（回收站）
                         </a>
                     </li>
                 </ul>

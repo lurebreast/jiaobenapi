@@ -8,7 +8,7 @@ class TypedataController  extends \ControllerAd{
 
         $page = $this->request->get('page', 'int', 1);
         $target = $this->request->get('target', 'string', 'index');
-        $typearr = $target == 'recycle' ? \Type::Find('is_delete = 1') : \Type::find('is_delete = 0');
+        $typearr = \Type::find('is_delete = 0');
 
         $this->view->setVar("type", $typearr);
         $typearrs = array();
@@ -18,6 +18,10 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("typearrs", $typearrs);
         //处理搜索
         $search = $this->request->get();
+        foreach (['orderid_less', 'status', 'typeid', 'sttime', 'endtime', 'recycle', 'data_unique'] as $v) {
+            !isset($search[$v]) && $search[$v] = null;
+        }
+
         $where = 'where 1';
         if (!empty($search['orderid_less'])){
             $where .= ' and orderid <'.$search['orderid_less'];
@@ -150,7 +154,10 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("uid", $uid);
     }
     public function typeadAction(){
-        $typearr = \Type::find();
+        $recycle = !empty($this->request->get('recycle')) ? true : false;
+        $typearr = $recycle ? \Type::find('is_delete = 1') : \Type::find('is_delete = 0');
+
+        $this->view->setVar("recycle", $recycle);
         $this->view->setVar("type", $typearr);
     }
     public function deltypeAction(){

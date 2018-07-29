@@ -24,6 +24,16 @@
 
         window.location.href = "<?= $this->url->get('typedata/deltype?typeid=') ?>" + typeid;
     }
+    function restortype() {
+        var typeid = '';
+        $("input:checkbox[name=typeid]").each(function(index){
+            if (this.checked) {
+                typeid += this.value + ',';
+            }
+        });
+
+        window.location.href = "<?= $this->url->get('typedata/restortype?typeid=') ?>" + typeid;
+    }
     function cleardata() {
         var typeid = '';
         $("input:checkbox[name=typeid]").each(function(index){
@@ -48,7 +58,6 @@
         <th>项目名称</th>
         <th>创建时间</th>
         <th>更新时间</th>
-        <th>回收站</th>
         <th>操作</th>
     </tr>
     </thead>
@@ -60,23 +69,34 @@
             <td><?= $item->typename;?></td>
             <td><?if ($item->createtime){echo date('Y-m-d H:i:s',$item->createtime);}?></td>
             <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
-            <td><?if ($item->is_delete){echo '是';}else{echo '否';}?></td>
             <td>
-                <a onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" class="btn btn-sm btn-success">修改</a>
-                <?php if ($this->session->uid == 2):?>
-                    <a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
-                    <a href="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">清除数据</a>
-                <?php endif;?>
-                <?php if ($item->is_delete == 0):?>
+                <?php if ($recycle):?>
+                    <?php if ($this->session->uid == 2):?>
+                        <a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
+                        <a href="<?= $this->url->get('typedata/restortype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">恢复</a>
+                    <?php endif;?>
+                <?php else:?>
+                    <a onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" class="btn btn-sm btn-success">修改</a>
                     <a href="<?= $this->url->get('typedata/recycletype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">移至回收站</a>
+                    <?php if ($this->session->uid == 2):?>
+                        <a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
+                        <a href="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">清除数据</a>
+                    <?php endif;?>
                 <?php endif;?>
             </td>
         </tr>
     <?php endforeach; ?>
     <tr>
         <td class="text-left" colspan="4">
-            <button class="btn btn-sm btn-danger delete" onclick="deltype();">删除</button>
-            <button class="btn btn-sm btn-danger delete" onclick="cleardata();">清除数据</button>
+            <?php if ($recycle):?>
+                <button class="btn btn-sm btn-danger delete" onclick="deltype();">删除</button>
+                <button class="btn btn-sm btn-danger delete" onclick="restortype();">恢复</button>
+            <?php else:?>
+                <button class="btn btn-sm btn-danger delete" onclick="deltype();">删除</button>
+                <button class="btn btn-sm btn-danger delete" onclick="cleardata();">清除数据</button>
+            <?php endif;?>
+
+
         </td>
     </tr>
     </tbody>
