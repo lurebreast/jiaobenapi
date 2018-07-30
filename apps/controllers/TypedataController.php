@@ -160,28 +160,6 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("recycle", $recycle);
         $this->view->setVar("type", $typearr);
     }
-    public function deltypeAction(){
-        $typeid = $this->request->get('typeid');
-        $typeid = explode(',', $typeid);
-
-        $typename = '';
-        foreach ($typeid as $id) {
-            $id = intval($id);
-            if ($id && $types = \Type::findfirst(intval($id))) {
-                if ($types->delete()){
-                    $this->modelsManager->createQuery("DELETE FROM Typedata WHERE tid = {$id}")->execute();
-                    $this->modelsManager->createQuery("DELETE FROM TypedataRecycle WHERE tid = {$id}")->execute();
-                    $typename .= $types->typename.',';
-                }
-            }
-        }
-
-        if ($typename) {
-            $this->flashSession->success('项目'.rtrim($typename, ',').'删除成功');
-        }
-
-        $this->response->redirect('typedata/typead');
-    }
 
     public function edittypeAction(){
         $this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
@@ -210,6 +188,67 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("typeid", $typeid);
     }
 
+    public function recycletypeAction(){
+        $typeid = $this->request->get('typeid');
+        $typeid = explode(',', $typeid);
+
+        foreach ($typeid as $id) {
+            $id = intval($id);
+
+            $typedata = new \Typedata();
+            $con = $typedata->getWriteConnection();
+
+            $con->query("UPDATE type SET is_delete = 1, updatetime=".time()." WHERE typeid = ".$id);
+            $con->query("insert into typedata_recycle select * from typedata where tid=$id");
+            $con->query("delete from typedata where tid=$id");
+        }
+
+        $this->flashSession->success('操作成功');
+        $this->response->redirect('typedata/typead');
+    }
+
+    public function deltypeAction(){
+        $typeid = $this->request->get('typeid');
+        $typeid = explode(',', $typeid);
+
+        $typename = '';
+        foreach ($typeid as $id) {
+            $id = intval($id);
+            if ($id && $types = \Type::findfirst(intval($id))) {
+                if ($types->delete()){
+                    $this->modelsManager->createQuery("DELETE FROM Typedata WHERE tid = {$id}")->execute();
+                    $this->modelsManager->createQuery("DELETE FROM TypedataRecycle WHERE tid = {$id}")->execute();
+                    $typename .= $types->typename.',';
+                }
+            }
+        }
+
+        if ($typename) {
+            $this->flashSession->success('项目'.rtrim($typename, ',').'删除成功');
+        }
+
+        $this->response->redirect('typedata/typead?recycle=1');
+    }
+
+    public function restortypeAction(){
+        $typeid = $this->request->get('typeid');
+        $typeid = explode(',', $typeid);
+
+        foreach ($typeid as $id) {
+            $id = intval($id);
+
+            $typedata = new \Typedata();
+            $con = $typedata->getWriteConnection();
+
+            $con->query("UPDATE type SET is_delete = 0, updatetime=".time()." WHERE typeid = ".$id);
+            $con->query("insert into typedata select * from typedata_recycle where tid=$id");
+            $con->query("delete from typedata_recycle where tid=$id");
+        }
+
+        $this->flashSession->success('操作成功');
+        $this->response->redirect('typedata/typead?recycle=1');
+    }
+
     public function deldataAction(){
         $typeid = $this->request->get('id');
         $typeid = intval($typeid);
@@ -230,8 +269,9 @@ class TypedataController  extends \ControllerAd{
         }catch (\Exception $e){
             $this->flashSession->error($e->getMessage());
         }
-        $this->response->redirect('typedata/index?typeid='.$tid);
+        $this->response->redirect('typedata/typead?recycle=');
     }
+
     /**
      * 清空数据
      */
@@ -252,32 +292,8 @@ class TypedataController  extends \ControllerAd{
         if ($typename) {
             $this->flashSession->success('清空项目'.rtrim($typename, ',').'数据成功');
         }
-        $this->response->redirect('typedata/typead');
-
+        $this->response->redirect('typedata/typead?recycle=1');
     }
-
-    public function recycletypeAction(){
-        $typeid = $this->request->get('typeid');
-        $typeid = intval($typeid);
-        try {
-            if (empty($typeid)){
-                Throw new \Exception('id为空！');
-            }
-
-            $typedata = new \Typedata();
-            $con = $typedata->getWriteConnection();
-
-            $con->query("UPDATE type SET is_delete = 1, updatetime=".time()." WHERE typeid = ".$typeid);
-            $con->query("insert into typedata_recycle select * from typedata where tid=$typeid");
-            $con->query("delete from typedata where tid=$typeid");
-
-            $this->flashSession->success('操作成功');
-        }catch (\Exception $e){
-            $this->flashSession->error($e->getMessage());
-        }
-        $this->response->redirect('typedata/typead');
-    }
-
 
     public function outdataAction(){
         set_time_limit(0);

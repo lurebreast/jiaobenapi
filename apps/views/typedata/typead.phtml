@@ -1,5 +1,4 @@
 <script>
-
     function edittype(id)
     {
         htmlobj1 = $.ajax({url: "<?= $this->url->get('typedata/edittype?typeid=') ?>" + id , async: false});
@@ -14,46 +13,25 @@
         return false;
     }
 
-    function deltype() {
-        var typeid = '';
+    function batchAll(action) {
+        typeid = '';
         $("input:checkbox[name=typeid]").each(function(index){
             if (this.checked) {
                 typeid += this.value + ',';
             }
         });
 
-        window.location.href = "<?= $this->url->get('typedata/deltype?typeid=') ?>" + typeid;
-    }
-    function restortype() {
-        var typeid = '';
-        $("input:checkbox[name=typeid]").each(function(index){
-            if (this.checked) {
-                typeid += this.value + ',';
-            }
-        });
-
-        window.location.href = "<?= $this->url->get('typedata/restortype?typeid=') ?>" + typeid;
-    }
-    function cleardata() {
-        var typeid = '';
-        $("input:checkbox[name=typeid]").each(function(index){
-            if (this.checked) {
-                typeid += this.value + ',';
-            }
-        });
-
-        window.location.href = "<?= $this->url->get('typedata/cleardata?typeid=') ?>" + typeid;
+        window.location.href = "/typedata/"+ action +"?typeid=" + typeid;
     }
 </script>
 <div class="pd2 cf">
     <h4 class="fl">项目管理</h4>
 
 </div>
-
 <table class="table table-bordered text-left table-hover">
     <thead>
     <tr>
-        <td class="text-left"><input type="checkbox" onclick="selectAll(this)" />全选</td>
+        <td width="64"><input type="checkbox" onclick="selectAll(this)" />全选</td>
         <th>项目id</th>
         <th>项目名称</th>
         <th>创建时间</th>
@@ -74,29 +52,26 @@
                     <?php if ($this->session->uid == 2):?>
                         <a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
                         <a href="<?= $this->url->get('typedata/restortype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">恢复</a>
+                        <a href="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">清除数据</a>
                     <?php endif;?>
                 <?php else:?>
                     <a onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" class="btn btn-sm btn-success">修改</a>
                     <a href="<?= $this->url->get('typedata/recycletype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">移至回收站</a>
-                    <?php if ($this->session->uid == 2):?>
-                        <a href="<?= $this->url->get('typedata/deltype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">删除</a>
-                        <a href="<?= $this->url->get('typedata/cleardata?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">清除数据</a>
-                    <?php endif;?>
                 <?php endif;?>
             </td>
         </tr>
     <?php endforeach; ?>
     <tr>
-        <td class="text-left" colspan="4">
+        <td class="text-left" colspan="6">
             <?php if ($recycle):?>
-                <button class="btn btn-sm btn-danger delete" onclick="deltype();">删除</button>
-                <button class="btn btn-sm btn-danger delete" onclick="restortype();">恢复</button>
+                <?php if ($this->session->uid == 2):?>
+                    <button class="btn btn-sm btn-danger delete" onclick="batchAll('deltype');">删除</button>
+                    <button class="btn btn-sm btn-danger delete" onclick="batchAll('restortype');">恢复</button>
+                    <button class="btn btn-sm btn-danger delete" onclick="batchAll('cleardata');">清除数据</button>
+                <?php endif;?>
             <?php else:?>
-                <button class="btn btn-sm btn-danger delete" onclick="deltype();">删除</button>
-                <button class="btn btn-sm btn-danger delete" onclick="cleardata();">清除数据</button>
+                <button class="btn btn-sm btn-danger delete" onclick="batchAll('recycletype');">移至回收站</button>
             <?php endif;?>
-
-
         </td>
     </tr>
     </tbody>
@@ -109,7 +84,6 @@
                 <h4 class="modal-title" id="myModalLabel">修改信息</h4>
             </div>
             <div id="mymodel" class="modal-body">
-
             </div>
         </div>
     </div>
