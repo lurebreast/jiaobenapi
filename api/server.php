@@ -5,9 +5,10 @@ $http = new swoole_http_server("127.0.0.1", 9501);
 
 $http->set(array(
     'daemonize' => 1,
-    'worker_num' => 4,
-    'max_request' => 500,
+    'worker_num' => 8,
+    'max_request' => 1000,
     'dispatch_mode' => 1,
+    'pid_file' => '/tmp/swoole.pid',
 ));
 $http->on("start", function ($server) {
     echo "Swoole http server is started at http://127.0.0.1:9501\n";
@@ -24,12 +25,3 @@ $http->on("request", function ($request, $response) {
 
 $http->start();
 
-function action_reload()
-{
-    global $http;
-    if ($http->reload()) {
-        return 'reload success';
-    } else {
-        return 'reload failed';
-    }
-}
