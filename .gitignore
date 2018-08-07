@@ -2,3 +2,4 @@
 /public/images/*.png
 /public/php_errors.log
 /apps/config/config.php
+/log-rotate.conf
