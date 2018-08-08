@@ -58,7 +58,7 @@ $params = $_GET;
         <button type="submit" class="btn btn-flat btn-success">搜索</button>
     </div>
 </form>
-<table class="table table-bordered text-left table-hover">
+<table class="table table-bordered text-left table-hover" style="table-layout: fixed; word-break: break-all;">
     <thead>
     <tr>
         <td width="64"><input type="checkbox" onclick="selectAll(this)" />全选</td>
@@ -69,8 +69,8 @@ $params = $_GET;
         <th width="74">项目名称</th>
         <th width="64">图片</th>
         <th width="64">图片1</th>
-        <th width="100">上传时间</th>
-        <th width="100">更新时间</th>
+        <th width="84">上传时间</th>
+        <th width="84">更新时间</th>
         <th>数据</th>
         <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>
     </tr>
