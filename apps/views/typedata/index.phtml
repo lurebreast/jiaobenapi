@@ -67,8 +67,8 @@ $params = $_GET;
         <th width="64" >提取</th>
         <th width="64">项目id</th>
         <th width="74">项目名称</th>
-        <th width="64">图片</th>
-        <th width="64">图片1</th>
+        <th width="150">图片</th>
+        <th width="150">图片1</th>
         <th width="84">上传时间</th>
         <th width="84">更新时间</th>
         <th>数据</th>
@@ -84,8 +84,8 @@ $params = $_GET;
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <td><?= $item->tid;?></td>
             <td><?= $typearrs[$item->tid];?></td>
-            <td><? if ($item->img){echo '<img src="'.$item->img.'" height="72"/>';}?></td>
-            <td><? if ($item->img1){echo '<img src="'.$item->img1.'" height="72"/>';}?></td>
+            <td><? if ($item->img){echo '<img src="'.$item->img.'" width="136"/>';}?></td>
+            <td><? if ($item->img1){echo '<img src="'.$item->img1.'" width="136"/>';}?></td>
             <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
             <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
             <td><?= $item->data;?></td>
