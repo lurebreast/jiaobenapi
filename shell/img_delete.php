@@ -43,6 +43,7 @@ function my_dir() {
                             echo $img."\n";
                         }
                         $result->free();
+                        usleep(80000);
                     }
                 }
             }
