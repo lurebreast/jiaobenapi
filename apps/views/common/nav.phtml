@@ -58,7 +58,7 @@ $action = $this->dispatcher->getActionName();
                 </a>
                 <ul class="<?php if($controller=='typedata'):?>active<?php endif;?> treeview-menu menu_level_1">
                     <li class="<?php if($controller=='typedata'&& $action=='index' && $target == 'index'):?>active<?php endif;?> first">
-                        <a href="<?= $this->url->get('typedata/index').'?target=index' ?>">
+                        <a href="<?= $this->url->get('typedata/index')?>">
                             <i class="fa fa-angle-double-right" aria-hidden="true"></i>数据列表
                         </a>
                     </li>

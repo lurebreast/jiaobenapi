@@ -7,10 +7,7 @@ $params['page'] = 1;
 ?>
 <div class=" form-inline">
     <div class="row">
-        <div class="col-sm-5">
-            <div class="dataTables_info hide" role="status" aria-live="polite">共 <?= $page->total_pages ?> 页 <?= $page->total_items ?> 条</div>
-        </div>
-        <div class="col-sm-7">
+        <div class="col-sm-8">
             <div class="dataTables_paginate paging_simple_numbers">
                 <ul class="pagination">
                     <?php $params['page'] = $page->first; ?>
