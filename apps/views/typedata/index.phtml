@@ -1,6 +1,8 @@
 <?php
 
 $params = $_GET;
+
+$superAdmin = $admin['id'] == 1;
 ?>
 <script>
     function addtype()
@@ -31,9 +33,12 @@ $params = $_GET;
 <script language="javascript" type="text/javascript" src="/static/js/My97DatePicker/WdatePicker.js"></script>
 <div class="pd2 cf">
     <h4 class="fl">数据列表</h4>
+    <?php if (!empty($admin['roles']['/typedata/index?addtype']) || $superAdmin):?>
     <h4 class="fr"><a  onclick="addtype()"  data-toggle="modal" data-target="#myModal" id="data" href="" title="添加项目" class="btn btn-sm btn-success">添加项目</a></h4>
+    <?php endif;?>
+    <?php if ($superAdmin):?>
     <h4 class="fr"><a   href="<?= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['typeid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime']).'&orderid_less='.$search['orderid_less']."&data_unique=".$search['data_unique'].'&target='.$search['target'];?>" title="导出" class="btn btn-sm btn-success">导出(最多导出二十万条)</a></h4>
-
+    <?php endif;?>
 </div>
 <form class="navbar-form navbar-left" action="<?= $this->url->get('typedata/index')?>" method="get" role="form">
     <div class="form-group mt0 ">
@@ -61,7 +66,9 @@ $params = $_GET;
 <table class="table table-bordered text-left table-hover" style="table-layout: fixed; word-break: break-all;">
     <thead>
     <tr>
-        <td width="64"><input type="checkbox" onclick="selectAll(this)" />全选</td>
+        <?php if ($superAdmin):?>
+            <td width="64"><input type="checkbox" onclick="selectAll(this)" />全选</td>
+        <?php endif;?>
         <th width="64">id</th>
         <th width="64">序号</th>
         <th width="64" >提取</th>
@@ -72,13 +79,17 @@ $params = $_GET;
         <th width="84">上传时间</th>
         <th width="84">更新时间</th>
         <th>数据</th>
-        <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>
+        <?php if ($superAdmin):?>
+            <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>
+        <?php endif;?>
     </tr>
     </thead>
     <tbody>
     <?php foreach ($page->items as $item): ?>
         <tr>
-            <td><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
+            <?php if ($superAdmin):?>
+                <td><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
+            <?php endif;?>
             <td><?= $item->id;?></td>
             <td><?= $item->orderid;?></td>
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
@@ -89,11 +100,9 @@ $params = $_GET;
             <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
             <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
             <td><?= $item->data;?></td>
-            <td>
-                <?php if ($this->session->uid == 2):?>
-                <a href="<?= $this->url->get('typedata/moveTypedata?ids='.$item->id.'&type=del') ?>" class="btn btn-sm btn-danger delete">删除</a>
-                <?php endif;?>
-            </td>
+            <?php if ($superAdmin):?>
+                <td><a href="<?= $this->url->get('typedata/moveTypedata?ids='.$item->id.'&type=del') ?>" class="btn btn-sm btn-danger delete">删除</a></td>
+            <?php endif;?>
         </tr>
     <?php endforeach; ?>
     </tbody>

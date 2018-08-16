@@ -1,4 +1,5 @@
-<?php if ($this->session->get('admin_auth'))
+<?php
+if ($this->session->get('admin_auth'))
 {
 ?>
     <div class="sonata-bc skin-black fixed wrapper">
@@ -8,7 +9,7 @@
                 <div class="row">
                     <div class="col-xs-12 col-md-12">
                         <div class="box box-primary">
-                            <div class="box-body table-responsive no-padding">
+                            <div class="box-body table-responsive no-padding" style="margin-top: 16px;margin-left: 10px;">
                                 <?php $this->flashSession->output() ?>
                                 <?= $this->getContent() ?>
                             </div>

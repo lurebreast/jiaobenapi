@@ -1,9 +1,12 @@
 <?php
 abstract class ControllerAd extends \ControllerBase {
 
-    public function beforeExecuteRoute() {
+    protected $typearr;
 
+    public function beforeExecuteRoute()
+    {
         parent::beforeExecuteRoute();
+
         if (!$this->session->get('admin_auth')) {
             $this->response->redirect('auth/index');
             return FALSE;
@@ -13,6 +16,13 @@ abstract class ControllerAd extends \ControllerBase {
             $this->flashSession->error('无效用户！');
             return FALSE;
         }
+
+        if (empty($this->admin['roles']['/typedata/index']) && $this->admin['roles']['allow_type']) {
+            $this->typearr = \Type::find('is_delete = 0 and typeid in('.$this->admin['roles']['allow_type'].')');
+        } else {
+            $this->typearr = \Type::find('is_delete = 0');
+        }
+        $this->view->setVar("type", $this->typearr);
     }
 
   /*  public function afterExecuteRoute() {

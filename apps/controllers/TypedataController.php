@@ -4,15 +4,13 @@ use Phalcon\Mvc\Model\Resultset\Simple as Resultset;
 
 class TypedataController  extends \ControllerAd{
 
-    public function indexAction(){
-
+    public function indexAction()
+    {
         $page = $this->request->get('page', 'int', 1);
         $target = $this->request->get('target', 'string', 'index');
-        $typearr = \Type::find('is_delete = 0');
 
-        $this->view->setVar("type", $typearr);
         $typearrs = array();
-        foreach ($typearr as $v){
+        foreach ($this->typearr as $v){
             $typearrs[$v->typeid] = $v->typename;
         }
         $this->view->setVar("typearrs", $typearrs);
@@ -101,6 +99,7 @@ class TypedataController  extends \ControllerAd{
                 $type->updatetime = $timestamp;
 
                 if ($type->save()){
+                    $this->addAdminAllowType($type->typeid);
                     $this->flashSession->success('添加成功');
                 }else{
                     $this->flashSession->error('添加失败');
@@ -118,8 +117,6 @@ class TypedataController  extends \ControllerAd{
         $typeid = intval($typeid);
 
         $exce = false;
-        $typearr = \Type::find('is_delete = 0');
-        $this->view->setVar("type", $typearr);
         if ($this->request->isPost() && $this->security->checkToken()) {
             try {
                 if ($this->request->hasFiles() != true) {
@@ -155,7 +152,15 @@ class TypedataController  extends \ControllerAd{
     }
     public function typeadAction(){
         $recycle = !empty($this->request->get('recycle')) ? true : false;
-        $typearr = $recycle ? \Type::find('is_delete = 1') : \Type::find('is_delete = 0');
+
+        $find = $recycle ? 'is_delete = 1' : 'is_delete = 0';
+
+        if (empty($this->admin['roles']['/typedata/index']) && $this->admin['roles']['allow_type']) {
+            $find .= ' and typeid in('.$this->admin['roles']['allow_type'].')';
+        } else {
+        }
+
+        $typearr = \Type::find($find);
 
         $this->view->setVar("recycle", $recycle);
         $this->view->setVar("type", $typearr);

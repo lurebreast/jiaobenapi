@@ -11,6 +11,7 @@
         <th>用户名</th>
         <th>状态</th>
         <th>备注</th>
+        <th>操作</th>
     </tr>
     </thead>
     <tbody>
@@ -20,8 +21,17 @@
             <td><?= $item->username;?></td>
             <td><?= $item->status == '1'?'正常':'冻结';?></td>
             <td><?= $item->beizhu;?></td>
+            <td>
+                <button class="btn btn-sm btn-success delete" onclick="doAdmin('/admin/addadmin?id=<?= $item->id;?>');">编辑</button>
+                <button class="btn btn-sm btn-danger delete" onclick="doAdmin('/admin/deladmin?id=<?= $item->id;?>');">删除</button>
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
 </table>
+<script type="text/javascript">
+    function doAdmin(href) {
+        window.location.href = href;
+    }
+</script>
 <?php $this->partial("common/pages", array('url' => 'admin/adminlist?page=', 'page' => $page)) ?>

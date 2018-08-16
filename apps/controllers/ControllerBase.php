@@ -2,12 +2,16 @@
 
 abstract class ControllerBase extends \Phalcon\Mvc\Controller
 {
+    /* @var $admin array */
+    protected $admin;
+
     public function beforeExecuteRoute() {
         \Phalcon\Tag::setTitleSeparator('·');
         \Phalcon\Tag::setTitle('校长');
         $this->view->setTemplateAfter('after');
         $this->view->setVar('config', $this->config);
         $this->view->setVar("domain_url", $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST']);
+        $this->view->setVar("admin", $this->getAdminUser());
     }
     public function afterExecuteRoute()
     {
@@ -58,18 +62,39 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
         }
     }
 
-    public function getUser($feild = NULL, $default = NULL) {
-        if ($this->session->get('identity')) {
-            $this->_user = \Admin::findFirst($this->session->get('identity'));
-            if ($feild) {
-                return ($this->_user && isset($this->_user->$feild)) ? $this->_user->$feild : $default;
-            }
+    public function getAdminUser()
+    {
+        if ($this->session->get('uid')) {
+            $this->admin = \CyAdmin::findFirst($this->session->get('uid'));
+            if ($this->admin) {
+                $this->admin = $this->admin->toArray();
+                $this->admin['roles'] = json_decode($this->admin['roles'], true);
 
-            return $this->_user;
+                return $this->admin;
+            }
         } else {
             return FALSE;
         }
     }
+
+    protected function addAdminAllowType($type)
+    {
+        $uid = $this->session->get('uid');
+        if ($uid && $uid != 1) { // 普通用户添加项目权限
+            $admin = \CyAdmin::findFirst($uid);
+            if ($admin) {
+                $roles = $admin->roles;
+                $roles = json_decode($roles, true);
+                $roles['allow_type'] .= ','.$type;
+                $roles = json_encode($roles);
+                $admin->roles = $roles;
+                return $admin->save();
+            }
+        }
+
+        return false;
+    }
+
     /**
      * 非加密发送数据
      */

@@ -46,6 +46,7 @@ class AuthController extends \ControllerBase {
                 $this->session->set('uid',$user->id );
                 $this->session->set('gid', $user->department_id);
                 $this->session->set('username', $user->username);
+                $this->session->set('user', $user->toArray());
 
                 $this->flashSession->success('登录成功!');
                 $this->response->redirect('index/index');

@@ -10,32 +10,34 @@ $params['page'] = 1;
         <div class="col-sm-8">
             <div class="dataTables_paginate paging_simple_numbers">
                 <ul class="pagination">
-                    <?php $params['page'] = $page->first; ?>
-                    <li class="paginate_button "><a href="<?= $this->url->get($url, $params); ?>" alt=""> <span aria-hidden="true">首页</span></a></li>
-                    <?php  $params['page'] = $page->before; ?>
-                    <li class="paginate_button previous"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">&laquo;</span> </a></li>
-                    <?php
-                    for ($i = $start_num; $i <= $total_num; ++$i) {
-                        $params['page'] = $i;
-                        $fullurl = $this->url->get($url, $params);
-                        if ($i == $page->current) {
-                            ?>
-                            <li class="paginate_button active"><span><?= $i ?></span></li>
-                            <?php
+                    <?php if ($total_num > 1):?>
+                        <?php $params['page'] = $page->first; ?>
+                        <li class="paginate_button "><a href="<?= $this->url->get($url, $params); ?>" alt=""> <span aria-hidden="true">首页</span></a></li>
+                        <?php  $params['page'] = $page->before; ?>
+                        <li class="paginate_button previous"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">&laquo;</span> </a></li>
+                        <?php
+                        for ($i = $start_num; $i <= $total_num; ++$i) {
+                            $params['page'] = $i;
+                            $fullurl = $this->url->get($url, $params);
+                            if ($i == $page->current) {
+                                ?>
+                                <li class="paginate_button active"><span><?= $i ?></span></li>
+                                <?php
 
-                        } else {
-                            ?>
-                            <li class="paginate_button"><a href="<?= $fullurl ?>"><?= $i ?></a></li>
-                            <?php
+                            } else {
+                                ?>
+                                <li class="paginate_button"><a href="<?= $fullurl ?>"><?= $i ?></a></li>
+                                <?php
 
+                            }
                         }
-                    }
 
-                    $params['page'] = $page->next;
-                    ?>
-                    <li class="paginate_button next"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">&raquo;</span> </a></li>
-                    <?php  $params['page'] = $page->last; ?>
-                    <li class="paginate_button"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">尾页</span> </a></li>
+                        $params['page'] = $page->next;
+                        ?>
+                        <li class="paginate_button next"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">&raquo;</span> </a></li>
+                        <?php  $params['page'] = $page->last; ?>
+                        <li class="paginate_button"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">尾页</span> </a></li>
+                    <?php endif;?>
                     <li class="paginate_button"><span>总条数：<?=$total_items?></span</li>
                 </ul>
 
