@@ -2,7 +2,7 @@
 
 $params = $_GET;
 
-$superAdmin = $admin['id'] == 1;
+$superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
 ?>
 <script>
     function addtype()

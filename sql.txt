@@ -1,2 +1,1 @@
-alter table cy_admin add roles mediumtext not null default '' comment '账号权限配置';
-update cy_admin set id=1 where id=2;
+update cy_admin set id=2 where id=3;

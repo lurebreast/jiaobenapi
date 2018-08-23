@@ -16,6 +16,7 @@
         </div>
     </div>
 
+    <?php if (empty($user['id']) || ($user['id'] !=1 && $user['id'] != 2)):?>
     <div class="form-group">
         <label class="col-xs-1"></label>
         <div class="col-xs-10">
@@ -79,6 +80,7 @@
         </div>
     </div>
 
+    <?php endif;?>
     <div class="form-group">
         <label class="col-xs-1"></label>
         <button type="submit" class="btn btn-flat btn-info btn-lg col-xs-2" style="margin-left: 15px;">提交</button>

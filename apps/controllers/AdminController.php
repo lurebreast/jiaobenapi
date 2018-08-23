@@ -75,7 +75,8 @@ class AdminController extends \ControllerBase
     public function adminlistAction(){
         $page = $this->request->get('page', 'int', 1);
         $adminlists = $this->modelsManager->createBuilder()
-            ->from('CyAdmin');
+            ->from('CyAdmin')
+            ->where('CyAdmin.id != "2"'); // 老板账号 可懂否
         $adminlists->orderBy('id desc');
         $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
             "builder" => $adminlists,

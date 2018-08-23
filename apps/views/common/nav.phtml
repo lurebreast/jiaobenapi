@@ -10,7 +10,7 @@ function accessAllow($uri)
 {
     global $admin;
 
-    return !empty($admin['roles'][$uri]) || $admin['id'] == 1; // id=1 超级管理员
+    return !empty($admin['roles'][$uri]) || $admin['id'] == 1 || $admin['id'] == 2; // id 1 超级管理员, id 2  老板账号
 }
 ?>
 
