@@ -36,6 +36,10 @@ class TypedataController  extends \ControllerAd{
         if (!empty($search['endtime'])){
             $where .= " and creattime < ".strtotime($search['endtime']);
         }
+        if (!$this->typeAll) {
+            $inTid = implode(',', array_keys($typearrs));
+            $where .= " and tid in($inTid)";
+        }
 
         $table = $target == 'recycle' ? 'typedata_recycle' : 'typedata';
         if (!empty($search['data_unique'])){

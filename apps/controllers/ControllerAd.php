@@ -2,6 +2,7 @@
 abstract class ControllerAd extends \ControllerBase {
 
     protected $typearr;
+    protected $typeAll = true;
 
     public function beforeExecuteRoute()
     {
@@ -19,6 +20,7 @@ abstract class ControllerAd extends \ControllerBase {
 
         if (empty($this->admin['roles']['/typedata/index']) && $this->admin['roles']['allow_type']) {
             $this->typearr = \Type::find('is_delete = 0 and typeid in('.$this->admin['roles']['allow_type'].')');
+            $this->typeAll = false;
         } else {
             $this->typearr = \Type::find('is_delete = 0');
         }
