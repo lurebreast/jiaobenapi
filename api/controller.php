@@ -15,7 +15,7 @@ function action_set($request)
     $tid =  isset($request->get['typeid']) ? $request->get['typeid'] : 0;
     $orderid =  isset($request->get['typedataid']) ? $request->get['typedataid'] : 0;
     $only =  isset($request->get['only']) ? $request->get['only'] : null;
-    $data =  isset($request->get['data']) ? $request->get['data'] : '';
+    $data =  isset($request->post['data']) ? $request->post['data'] : ($request->get['data'] ? $request->get['data'] : '');
     $imgBase64 =  isset($request->post['img']) ? $request->post['img'] : '';
     $imgBase641 =  isset($request->post['img1']) ? $request->post['img1'] : '';
 
