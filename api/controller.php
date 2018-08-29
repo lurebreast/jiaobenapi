@@ -15,16 +15,9 @@ function action_set($request)
     $tid =  isset($request->get['typeid']) ? $request->get['typeid'] : 0;
     $orderid =  isset($request->get['typedataid']) ? $request->get['typedataid'] : 0;
     $only =  isset($request->get['only']) ? $request->get['only'] : null;
+    $data =  isset($request->get['data']) ? $request->get['data'] : '';
     $imgBase64 =  isset($request->post['img']) ? $request->post['img'] : '';
     $imgBase641 =  isset($request->post['img1']) ? $request->post['img1'] : '';
-
-    if ($request->post('data')) {
-        $data = $request->post('data');
-    } elseif ($request->get['data']) {
-        $data = $request->get('data');
-    } else {
-        $data = '';
-    }
 
     if (!$tid) {
         return error('项目id或者数据为空');
