@@ -54,7 +54,7 @@ if ($json = $redis->lPop('dataadd_files')) {
                 $data = iconv($encode, 'UTF-8', $data);
             }
 
-            $arr[] = "($tid, ".getOrderId($tid).", 1, '".$mysqli->escape_string($data)."', $time)1";
+            $arr[] = "($tid, ".getOrderId($tid).", 1, '".$mysqli->escape_string($data)."', $time)";
             if ($i % 1000 == 0) {
 
                 $values = implode(', ', $arr);
