@@ -6,6 +6,7 @@
  * Time: 16:03
  */
 
+ini_set('memory_limit','4096M');
 
 $redis = new Redis();
 $redis->connect('127.0.0.1');
@@ -18,9 +19,14 @@ if ($json = $redis->lPop('dataadd_files')) {
         $tid = $json['tid'];
         $file = $json['file'];
 
-        $config = include_once dirname(__FILE__).'/../config/config.php';
+        $config = include_once __DIR__.'/../config/config.php';
 
-        $mysqli = new mysqli($config['database']['host'].":".$config['database']['port'], $config['database']['username'], $config['database']['password'], $config['database']['dbname']);
+        $host = $config['database']['host'].":".$config['database']['port'];
+        $user = $config['database']['username'];
+        $pwd = $config['database']['password'];
+        $db = $config['database']['dbname'];
+
+        $mysqli = new mysqli($host, $user, $pwd, $db);
         //如果连接错误
         if (mysqli_connect_errno()) {
             echo "连接数据库失败：" . mysqli_connect_error();
@@ -32,8 +38,12 @@ if ($json = $redis->lPop('dataadd_files')) {
         $time = time();
 
         //输出文本中所有的行，直到文件结束为止。
+        $arr = [];
+        $i = 0;
+
         while (!feof($fp)) {
 
+            $i++;
             $data = trim(fgets($fp));
             if (!$data) {
                 continue;
@@ -44,10 +54,20 @@ if ($json = $redis->lPop('dataadd_files')) {
                 $data = iconv($encode, 'UTF-8', $data);
             }
 
-            $mysqli->query("insert into typedata(data, creattime, status, tid, orderid) value('{$data}', '$time', 1, '$tid', '".getOrderId($tid)."')");
+            $arr[] = "($tid, ".getOrderId($tid).", 1, '".$mysqli->escape_string($data)."', $time)1";
+            if ($i % 1000 == 0) {
 
-            echo $mysqli->insert_id . "\n";
+                $values = implode(', ', $arr);
+                $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
+
+                if (!$mysqli->query($sql)) {
+                    error_log($mysqli->errno.' ' .$mysqli->error);
+                }
+                echo (memory_get_usage() / 1024).'kb'."\n";
+                $arr = [];
+            }
         }
+
         fclose($fp);
         $mysqli->close();
         unlink($file);
