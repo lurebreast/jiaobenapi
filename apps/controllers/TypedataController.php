@@ -132,8 +132,11 @@ class TypedataController  extends \ControllerAd{
                         throw new \Exception('没有选择项目！');
                     }
 
-                    $file_name = $_SERVER['DOCUMENT_ROOT'].'/../apps/cron/'.$file->getName();
+                    if (strpos($file->getName(), '.txt') === false) {
+                        throw new \Exception($file->getName()."上传文件不是txt文件");
+                    }
 
+                    $file_name = $_SERVER['DOCUMENT_ROOT'].'/../apps/cron/import_data_'.$typeid.'.txt';
                     if (file_exists($file_name)) {
                         throw new \Exception($file->getName()."文件已经上传，请务重复");
                     }
