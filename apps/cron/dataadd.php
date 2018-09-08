@@ -68,6 +68,16 @@ if ($json = $redis->lPop('dataadd_files')) {
             }
         }
 
+        if ($arr) {
+            $values = implode(', ', $arr);
+            $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
+
+            if (!$mysqli->query($sql)) {
+                error_log($mysqli->errno.' ' .$mysqli->error);
+            }
+            echo (memory_get_usage() / 1024).'kb'."\n";
+        }
+
         fclose($fp);
         $mysqli->close();
         unlink($file);
