@@ -26,14 +26,26 @@ if (mysqli_connect_errno()) {
     die;
 }
 
-$arr = json_decode($redis->lPop('dataadd_files'), true);
+$json = $redis->lPop('dataadd_files');
+
+if (!$json) {
+    $mysqli->close();
+    $redis->close();
+    die;
+}
+
+$arr = json_decode($json, true);
 
 if (!file_exists($arr['file'])) {
+    $mysqli->close();
+    $redis->close();
     error_log("文件不存在：" . $arr['file']);
     die;
 }
 
 if (!is_numeric($arr['tid'])) {
+    $mysqli->close();
+    $redis->close();
     error_log("项目id不存在");
     die;
 }
