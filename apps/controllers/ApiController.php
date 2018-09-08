@@ -84,6 +84,7 @@ class ApiController extends \ControllerBase
             $newdata->updatetime = time();
 
             if ($newdata->save()){
+                file_put_contents('/tmp/acc.log', date('Y-m-d H:i:s').' '.$_SERVER['REQUEST_URI'].' tid:'.$typeid.',orderid:'.$orderid.',data:'.$newdata->data."\n", FILE_APPEND|LOCK_EX);
                 $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));
             }else{
                 $this->serror('数据保存失败');
