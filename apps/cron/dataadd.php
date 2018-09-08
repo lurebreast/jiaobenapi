@@ -9,88 +9,92 @@
 ini_set('memory_limit','4096M');
 
 $redis = new Redis();
-$redis->connect('127.0.0.1');
+$redis->pconnect('127.0.0.1');
 
-if ($json = $redis->lPop('dataadd_files')) {
-    $json = json_decode($json, true);
+$config = include_once __DIR__.'/../config/config.php';
+$host = $config['database']['host'].":".$config['database']['port'];
+$user = $config['database']['username'];
+$pwd = $config['database']['password'];
+$db = $config['database']['dbname'];
 
-    if (file_exists($json['file'])) {
+$mysqli = new mysqli($host, $user, $pwd, $db);
 
-        $tid = $json['tid'];
-        $file = $json['file'];
+//如果连接错误
+if (mysqli_connect_errno()) {
+    error_log("连接数据库失败：" . mysqli_connect_error());
+    $mysqli = null;
+    die;
+}
 
-        $config = include_once __DIR__.'/../config/config.php';
+$arr = json_decode($redis->lPop('dataadd_files'), true);
 
-        $host = $config['database']['host'].":".$config['database']['port'];
-        $user = $config['database']['username'];
-        $pwd = $config['database']['password'];
-        $db = $config['database']['dbname'];
+if (!file_exists($arr['file'])) {
+    error_log("文件不存在：" . $arr['file']);
+    die;
+}
 
-        $mysqli = new mysqli($host, $user, $pwd, $db);
-        //如果连接错误
-        if (mysqli_connect_errno()) {
-            echo "连接数据库失败：" . mysqli_connect_error();
-            $mysqli = null;
-            exit;
+if (!is_numeric($arr['tid'])) {
+    error_log("项目id不存在");
+    die;
+}
+
+$tid = $arr['tid'];
+$file = $arr['file'];
+
+/*$file = __DIR__.'/aa.txt';
+$tid = 42;*/
+
+$fp = fopen($file, "r");
+$time = time();
+
+//输出文本中所有的行，直到文件结束为止。
+$arr = [];
+$i = 0;
+
+while (!feof($fp)) {
+    $i++;
+    $data = trim(fgets($fp));
+    if (!$data) {
+        continue;
+    }
+
+    $encode = mb_detect_encoding($data, array('ASCII', 'UTF-8', 'GB2312', 'GBK'));
+    if ($encode != 'UTF-8') {
+        $data = iconv($encode, 'UTF-8', $data);
+    }
+
+    $arr[] = "($tid, ".getOrderId($redis, $mysqli, $tid).", 1, '".$mysqli->escape_string($data)."', $time)";
+    if ($i % 1000 == 0) {
+
+        $values = implode(', ', $arr);
+        $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
+
+        echo $sql;
+        if (!$mysqli->query($sql)) {
+            error_log($mysqli->errno.' ' .$mysqli->error);
         }
-
-        $fp = fopen($file, "r");
-        $time = time();
-
-        //输出文本中所有的行，直到文件结束为止。
+        echo (memory_get_usage() / 1024).'kb'."\n";
         $arr = [];
-        $i = 0;
-
-        while (!feof($fp)) {
-
-            $i++;
-            $data = trim(fgets($fp));
-            if (!$data) {
-                continue;
-            }
-
-            $encode = mb_detect_encoding($data, array('ASCII', 'UTF-8', 'GB2312', 'GBK'));
-            if ($encode != 'UTF-8') {
-                $data = iconv($encode, 'UTF-8', $data);
-            }
-
-            $arr[] = "($tid, ".getOrderId($tid).", 1, '".$mysqli->escape_string($data)."', $time)";
-            if ($i % 1000 == 0) {
-
-                $values = implode(', ', $arr);
-                $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
-
-                if (!$mysqli->query($sql)) {
-                    error_log($mysqli->errno.' ' .$mysqli->error);
-                }
-                echo (memory_get_usage() / 1024).'kb'."\n";
-                $arr = [];
-            }
-        }
-
-        if ($arr) {
-            $values = implode(', ', $arr);
-            $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
-
-            if (!$mysqli->query($sql)) {
-                error_log($mysqli->errno.' ' .$mysqli->error);
-            }
-            echo (memory_get_usage() / 1024).'kb'."\n";
-        }
-
-        fclose($fp);
-        $mysqli->close();
-        unlink($file);
     }
 }
 
-function getOrderId($tid)
+if ($arr) {
+    $values = implode(', ', $arr);
+    $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
+
+    if (!$mysqli->query($sql)) {
+        error_log($mysqli->errno.' ' .$mysqli->error);
+    }
+    echo (memory_get_usage() / 1024).'kb'."\n";
+}
+
+fclose($fp);
+$mysqli->close();
+$redis->close();
+unlink($file);
+
+function getOrderId(Redis $redis, Mysqli $mysqli, $tid)
 {
-    global $mysqli;
-
-    $redis = new Redis();
-    $redis->connect('127.0.0.1');
-
     $key = 'increment_order_id_'.$tid.'_2';
     if (!$redis->exists($key)) {
 
