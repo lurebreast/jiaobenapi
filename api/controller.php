@@ -26,14 +26,14 @@ function action_set($request)
     $mysqli = getMysqli();
 
     $type = $mysqli->query("select typeid from type where typeid='{$tid}'");
-    if (!$type) {
+    if (!$type->fetch_assoc()) {
         $mysqli->close();
         return error('没有此项目');
     }
 
     if ($only == 1){
         $typedata = $mysqli->query("select id from typedata where tid='{$tid}' and data='".$mysqli->escape_string($data)."' limit 1");
-        if ($typedata) {
+        if ($typedata->fetch_assoc()) {
             $typedata->free();
             $mysqli->close();
             return error('该数据重复');
