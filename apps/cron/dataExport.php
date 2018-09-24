@@ -7,6 +7,7 @@
  */
 
 ini_set('memory_limit','4096M');
+ini_set('display_errors','On');
 
 $redis = new Redis();
 $redis->pconnect('127.0.0.1');
@@ -28,7 +29,7 @@ if (mysqli_connect_errno()) {
 
 $json = $redis->lPop('data_export');
 
-var_dump($json);die;
+$json = '{"_url":"\/typedata\/outdata","typeid":"44","status":"0","sttime":"","endtime":""}';
 if (!$json) {
     $mysqli->close();
     $redis->close();
@@ -37,95 +38,79 @@ if (!$json) {
 
 $arr = json_decode($json, true);
 
-if (!file_exists($arr['file'])) {
-    $mysqli->close();
-    $redis->close();
-    error_log("文件不存在：" . $arr['file']);
-    die;
+$where = "tid={$arr['typeid']}";
+$arr['status'] && $where .= " and status={$arr['status']}";
+$arr['sttime'] && $where .= " and creattime>=".strtotime($arr['sttime']);
+$arr['endtime'] && $where .= " and creattime<".strtotime($arr['endtime']);
+
+if (!empty($arr['data_unique'])) {
+    $sql = "select count(DISTINCT(data)) as total from typedata where $where";
+} else {
+    $sql = "select count(*) as total from typedata where $where";
 }
 
-if (!is_numeric($arr['tid'])) {
-    $mysqli->close();
-    $redis->close();
-    error_log("项目id不存在");
-    die;
+$res = $mysqli->query($sql);
+$total = $res->fetch_assoc()['total'];
+
+$limit = 2;
+$limitMerge = 20;
+
+$times = ceil($total / $limit);
+$fileMax = ceil($total / 20);
+
+$redis->hset('data_export_'.$arr['typeid'], 'complete', $times);
+
+$id = 0;
+
+$fileInc = 0;
+for ($i = 0; $i < $times; $i++) {
+
+    if ($i % $limitMerge === 0) {
+        $fileInc++;
+        $file = '/tmp/data_'.$arr['typeid'].'_'.$fileInc.'.csv';
+        $fp = fopen($file, 'w');
+        fwrite($fp,chr(0xEF).chr(0xBB).chr(0xBF)); //Windows下使用BOM来标记文本文件的编码方式
+        fputcsv($fp, [
+            '序号',
+            '提取',
+            '项目id',
+            '项目名称',
+            '图片',
+            '图片1',
+            '上传时间',
+            '更新时间',
+            '数据',
+        ]);
+    }
+
+    $sql = "select * from typedata where id>{$id} and $where";
+    if (!empty($arr['data_unique'])) {
+        $sql .= " group by data";
+    }
+
+    $sql .= " limit $limit";
+    echo $sql."\n";
+
+    $res = $mysqli->query($sql);
+    while($row = $res->fetch_assoc()) {
+        fputcsv($fp, [
+            $row['orderid'],
+            $row['status'] == 1 ? '未提取' : '已提取',
+            $row['tid'],
+            $row['tid'], //
+            $row['img'] ? 'http://47.99.122.175/'.$row['img'] : '',
+            $row['img1'] ? 'http://47.99.122.175/'.$row['img1'] : '',
+            date('Y-m-d H:i:s', $row['creattime']),
+            $row['updatetime'] ? date('Y-m-d H:i:s', $row['updatetime']) : '',
+            $row['data'],
+        ]);
+
+        $id = $row['id'];
+    }
+
+    $redis->hset('data_export_'.$arr['typeid'], 'rate', $i);
 }
 
-$tid = $arr['tid'];
-$file = $arr['file'];
-
-/*$file = __DIR__.'/aa.txt';
-$tid = 42;*/
-
-$fp = fopen($file, "r");
-$time = time();
-
-//输出文本中所有的行，直到文件结束为止。
-$arr = [];
-$i = 0;
-
-while (!feof($fp)) {
-    $i++;
-    $data = trim(fgets($fp));
-    if (!$data) {
-        continue;
-    }
-
-    $encode = mb_detect_encoding($data, array('ASCII', 'UTF-8', 'GB2312', 'GBK'));
-    if ($encode != 'UTF-8') {
-        $data = iconv($encode, 'UTF-8', $data);
-    }
-
-    $arr[] = "($tid, ".getOrderId($redis, $mysqli, $tid).", 1, '".$mysqli->escape_string($data)."', $time)";
-    if ($i % 1000 == 0) {
-
-        $values = implode(', ', $arr);
-        $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
-
-        echo $sql;
-        if (!$mysqli->query($sql)) {
-            error_log($mysqli->errno.' ' .$mysqli->error);
-        }
-        echo (memory_get_usage() / 1024).'kb'."\n";
-        $arr = [];
-    }
-}
-
-if ($arr) {
-    $values = implode(', ', $arr);
-    $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
-
-    if (!$mysqli->query($sql)) {
-        error_log($mysqli->errno.' ' .$mysqli->error);
-    }
-    echo (memory_get_usage() / 1024).'kb'."\n";
-}
-
-fclose($fp);
-$mysqli->close();
+$redis->hset('data_export_'.$arr['typeid'], 'lock', 0);
 $redis->close();
-unlink($file);
-
-function getOrderId(Redis $redis, Mysqli $mysqli, $tid)
-{
-    $key = 'increment_order_id_'.$tid.'_2';
-    if (!$redis->exists($key)) {
-
-        //构造SQL语句
-        $query = "SELECT * FROM  typedata where tid={$tid} order by id desc limit 1";
-        //执行SQL语句
-
-        $result = $mysqli->query($query);
-        //遍历结果
-
-        $orderid = $result->fetch_array(MYSQLI_BOTH)['orderid'];
-        empty($orderid) && $orderid = 0;
-
-        $redis->set($key, $orderid);
-    }
-
-    $orderid = $redis->incr($key);
-    $redis->rPush('tid_orderid_'.$tid, $orderid);
-
-    return $orderid;
-}
+$mysqli->close();

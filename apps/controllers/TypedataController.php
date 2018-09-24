@@ -312,6 +312,7 @@ class TypedataController  extends \ControllerAd{
             'data' => [],
             'msg' => ''
         ];
+        $redis = $this->getRedis();
         $search = $this->request->get();
 
         if (empty($search['typeid'])) {
@@ -319,9 +320,16 @@ class TypedataController  extends \ControllerAd{
             $json['msg'] = '必须选择一个项目';
         }
 
+        if ($redis->hget('data_export_'.$search['typeid'], 'lock')) {
+            $json['code'] = 500;
+            $json['msg'] = '该项目导出，请等等导出完成';
+        }
+
         echo json_encode($json);
         if ($json['code'] == 200) {
-            $this->getRedis()->lPush('data_export', json_encode($search));
+            $redis->lPush('data_export', json_encode($search));
+            $redis->hset('data_export_'.$search['typeid'], 'rate', 0);
+            $redis->hset('data_export_'.$search['typeid'], 'lock', 1);
         }
         die;
 
