@@ -16,14 +16,11 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("typearrs", $typearrs);
         //处理搜索
         $search = $this->request->get();
-        foreach (['orderid_less', 'status', 'typeid', 'sttime', 'endtime', 'recycle', 'data_unique'] as $v) {
+        foreach (['status', 'typeid', 'sttime', 'endtime', 'recycle', 'data_unique'] as $v) {
             !isset($search[$v]) && $search[$v] = null;
         }
 
         $where = 'where 1';
-        if (!empty($search['orderid_less'])){
-            $where .= ' and orderid <'.$search['orderid_less'];
-        }
         if (!empty($search['status'])){
             $where .= ' and status ='.$search['status'];
         }
@@ -167,7 +164,7 @@ class TypedataController  extends \ControllerAd{
         } else {
         }
 
-        $typearr = \Type::find($find);
+        $typearr = \Type::find([$find, 'order' => 'typeid desc']);
 
         $this->view->setVar("recycle", $recycle);
         $this->view->setVar("type", $typearr);
@@ -310,22 +307,29 @@ class TypedataController  extends \ControllerAd{
     public function outdataAction(){
         set_time_limit(0);
 
+        $json = [
+            'code' => 200,
+            'data' => [],
+            'msg' => ''
+        ];
         $search = $this->request->get();
 
         if (empty($search['typeid'])) {
-            $this->flashSession->error('必须选择一个项目');
-            header('Location:/typedata/index');
-            die;
+            $json['code'] = 500;
+            $json['msg'] = '必须选择一个项目';
         }
+
+        echo json_encode($json);
+        if ($json['code'] == 200) {
+            $this->getRedis()->lPush('data_export', json_encode($search));
+        }
+        die;
 
         $table = $search['target'] == 'recycle' ? "typedata_recycle" : 'typedata';
         $table1 = $search['target'] == 'recycle' ? "TypedataRecycle" : 'Typedata';
 
         $where = " where t.tid = {$search['typeid']}";
         $groupBy = '';
-        if (!empty($search['orderid_less'])){
-            $where .= " and t.orderid < {$search['orderid_less']}";
-        }
         if (!empty($search['status'])){
             $where .= " and t.status = {$search['status']}";
         }

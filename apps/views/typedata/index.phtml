@@ -5,12 +5,6 @@ $params = $_GET;
 $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
 ?>
 <script>
-    function addtype()
-    {
-        htmlobj1 = $.ajax({url: "<?= $this->url->get('typedata/typeadd') ?>", async: false});
-        $("#mymodel").html(htmlobj1.responseText);
-    }
-
     function selectAll(o) {
         $("input:checkbox[name=ids]").each(function(){
             this.checked = o.checked;
@@ -29,36 +23,53 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
 
         window.location.href = "<?= $this->url->get('typedata/moveTypedata?ids=') ?>" + ids + '&type=' + type;
     }
+
+    function exportSend() {
+        $.getJSON(
+            '<?php echo $this->url->get('typedata/outdata');?>',
+            {
+                typeid: $("#typeid").val(),
+                status: $("#status").val(),
+                sttime: $("#sttime").val(),
+                endtime: $("#endtime").val(),
+                data_unique: $("#data_unique:checked").val()
+            },
+            function(result){
+                if (result.code != 200) {
+                    alert(result.msg);
+                    window.location.reload();
+                }
+            }
+        );
+    }
 </script>
 <script language="javascript" type="text/javascript" src="/static/js/My97DatePicker/WdatePicker.js"></script>
 <div class="pd2 cf">
     <h4 class="fl">数据列表</h4>
     <?php if (!empty($admin['roles']['/typedata/index?addtype']) || $superAdmin):?>
-    <h4 class="fr"><a  onclick="addtype()"  data-toggle="modal" data-target="#myModal" id="data" href="" title="添加项目" class="btn btn-sm btn-success">添加项目</a></h4>
+        <a data-toggle="modal" data-target="#myModal" id="data" href="" class="btn btn-sm btn-success">添加项目</a>
     <?php endif;?>
     <?php if ($superAdmin):?>
-    <h4 class="fr"><a   href="<?= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['typeid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime']).'&orderid_less='.$search['orderid_less']."&data_unique=".$search['data_unique'].'&target='.$search['target'];?>" title="导出" class="btn btn-sm btn-success">导出(最多导出二十万条)</a></h4>
+        <!--<a href="<?/*= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['typeid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime'])."&data_unique=".$search['data_unique'].'&target='.$search['target'];*/?>" title="导出" class="btn btn-sm btn-success">导出</a>-->
+        <a onclick="exportSend();" href="" data-toggle="modal" data-target="#modal_export" class="btn btn-sm btn-success">导出</a>
     <?php endif;?>
 </div>
 <form class="navbar-form navbar-left" action="<?= $this->url->get('typedata/index')?>" method="get" role="form">
     <div class="form-group mt0 ">
-        序号小于：<input type="text" name="orderid_less" value="<? if(!empty($search['orderid_less'])) echo $search['orderid_less'];?>"/>
-        提取：
-        <select class="form-control" id="status" name="status"  >
-            <option  value="0">请选择</option>
-            <option  value='1' <?php if ($search['status'] === '1') echo 'selected'?>>未提取</option>
-            <option  value="2" <?php if ($search['status'] == '2') echo 'selected'?>>已提取</option>
-        </select>
-        项目:
-        <select class="form-control" id="typeid" name="typeid"  >
-            <option  value="">请选择</option>
+        项目<select class="form-control" id="typeid" name="typeid"  >
+            <option value="">请选择</option>
             <?php foreach ($type as $ptype): ?>
-                <option  value='<?= $ptype->typeid;?>' <?php if ($search['typeid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>||<?= $ptype->typename;?></option>
+                <option value='<?= $ptype->typeid;?>' <?php if ($search['typeid'] == $ptype->typeid) echo 'selected'?>><?= $ptype->typeid;?>|<?= $ptype->typename;?></option>
             <?php endforeach; ?>
         </select>
-        上传时间：<input id="sttime"  class="form-control" name="sttime"  placeholder="开始日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['sttime'];?>">
-        -<input id="endtime" class="form-control" name="endtime"  placeholder="结束日期"　data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['endtime'];?>">
-        数据去重<input name='data_unique' type="checkbox" <? if (!empty($search['data_unique'])) echo 'checked'?> value="1"/>
+        提取<select class="form-control" id="status" name="status"  >
+            <option value="0">请选择</option>
+            <option value='1'<?php if ($search['status'] === '1') echo 'selected'?>>未提取</option>
+            <option value="2"<?php if ($search['status'] == '2') echo 'selected'?>>已提取</option>
+        </select>
+        上传时间<input id="sttime"  class="form-control" name="sttime"  placeholder="开始日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['sttime'];?>" style="width: 142px;">
+        -<input id="endtime" class="form-control" name="endtime"  placeholder="结束日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['endtime'];?>" style="width: 142px;">
+        数据去重<input id="data_unique" name='data_unique' type="checkbox" <? if (!empty($search['data_unique'])) echo 'checked'?> value="1"/>
         <input type="hidden" name="target" value="<?=$search['target'] ?>">
         <button type="submit" class="btn btn-flat btn-success">搜索</button>
     </div>
@@ -67,7 +78,7 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
     <thead>
     <tr>
         <?php if ($superAdmin):?>
-            <td width="64"><input type="checkbox" onclick="selectAll(this)" />全选</td>
+            <td width="64"><input type="checkbox" onclick="selectAll(this)"/>全选</td>
         <?php endif;?>
         <th width="64">id</th>
         <th width="64">序号</th>
@@ -116,9 +127,37 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel">添加项目</h4>
             </div>
-            <div id="mymodel" class="modal-body">
+            <form class="form-horizontal" role="form" method="post" action="<?= $this->url->get('typedata/typeadd') ?>">
+                <input type="hidden" name="<?= $this->security->getTokenKey() ?>" value="<?= $this->security->getToken() ?>"/>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">项目名称：</label>
+                    <div class="col-xs-10">
+                        <input type="text" name="typename" placeholder="项目名称" class="form-control" required=""  value="">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-flat btn-info btn-lg btn-block">提交</button>
+            </form>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="modal_export" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">添加项目</h4>
             </div>
+            <form class="form-horizontal" role="form" method="post" action="<?= $this->url->get('typedata/typeadd') ?>">
+                <input type="hidden" name="<?= $this->security->getTokenKey() ?>" value="<?= $this->security->getToken() ?>"/>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">项目名称：</label>
+                    <div class="col-xs-10">
+                        <input type="text" name="typename" placeholder="项目名称" class="form-control" required=""  value="">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-flat btn-info btn-lg btn-block">提交</button>
+            </form>
         </div>
     </div>
 </div>
