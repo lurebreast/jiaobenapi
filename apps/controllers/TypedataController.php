@@ -304,6 +304,18 @@ class TypedataController  extends \ControllerAd{
         $this->response->redirect('typedata/typead?recycle=1');
     }
 
+    public function ajax_export_processAction()
+    {
+        $tid = $this->request->get('typeid');
+        $result = $this->getRedis()->hGetAll('data_export_'.$tid);
+        if ($result['lock'] == 0) {
+            $result['files'] = json_decode($result['files'], true);
+        }
+
+        echo json_encode($result);
+        die;
+    }
+
     public function outdataAction(){
         set_time_limit(0);
 
@@ -328,144 +340,11 @@ class TypedataController  extends \ControllerAd{
         echo json_encode($json);
         if ($json['code'] == 200) {
             $redis->lPush('data_export', json_encode($search));
-            $redis->hset('data_export_'.$search['typeid'], 'rate', 0);
+            $redis->hset('data_export_'.$search['typeid'], 'percent', 1);
             $redis->hset('data_export_'.$search['typeid'], 'lock', 1);
+            $redis->expire('data_export_'.$search['typeid'], 3600);
         }
         die;
-
-        $table = $search['target'] == 'recycle' ? "typedata_recycle" : 'typedata';
-        $table1 = $search['target'] == 'recycle' ? "TypedataRecycle" : 'Typedata';
-
-        $where = " where t.tid = {$search['typeid']}";
-        $groupBy = '';
-        if (!empty($search['status'])){
-            $where .= " and t.status = {$search['status']}";
-        }
-        if (!empty($search['sttime'])){
-            $where .= " and t.creattime >= ".strtotime($search['sttime']);
-        }
-        if (!empty($search['endtime'])){
-            $where .= " and t.creattime < ".strtotime($search['endtime']);
-        }
-        if (!empty($search['data_unique'])){
-            $groupBy = ' group by t.data';
-            $sql = "SELECT COUNT(DISTINCT(t.data)) total FROM $table t $where";
-        } else {
-            $sql = "SELECT count(*) as total FROM $table AS t $where";
-
-        }
-
-        $typedata = new \Typedata();
-        $countnum =  (new Resultset(null, $typedata, $typedata->getReadConnection()->query($sql, null)))->getFirst()->total;
-
-        $file = '/tmp/data-'.time().'.csv';
-
-        $csv_data = [[
-            '序号',
-            '提取',
-            '项目id',
-            '项目名称',
-            '图片',
-            '图片1',
-            '上传时间',
-            '更新时间',
-            '数据',
-        ]];
-
-        $typearr = \Type::find();
-        $this->view->setVar("type", $typearr);
-        $typearrs = array();
-
-        foreach ($typearr as $v){
-            $typearrs[$v->typeid] = $v->typename;
-        }
-
-        $limit = 1000;
-        $pages = ceil($countnum / $limit);
-        $pages > 200 && $pages = 2000; // 最多取二十万条数据
-        for ($i = 1; $i <= $pages; $i++) {
-
-            $first = $i == 1;
-            if ($first) {
-                $phql = "SELECT t.* FROM $table1 AS t $where $groupBy order by t.id desc limit $limit";
-
-            } else {
-                $phql = "SELECT t.* FROM $table1 AS t $where and id < '{$id}' $groupBy order by t.id desc limit $limit";
-            }
-
-            $res = $total = $this->modelsManager->createQuery($phql)->execute();
-
-            !$first && $csv_data = [];
-            foreach ($res as $data){
-                $csv_data[] = [
-                    $data->orderid,
-                    $data->status == 1 ? '未提取' : '已提取',
-                    $data->tid,
-                    $typearrs[$data->tid],
-
-                    $data->img ? $this->view->getVar("domain_url").$data->img : '',
-                    $data->img1 ? $this->view->getVar("domain_url").$data->img1 : '',
-                    date('Y-m-d H:i:s', $data->creattime),
-                    $data->updatetime ? date('Y-m-d H:i:s', $data->updatetime) : '',
-                    $data->data,
-                ];
-
-                $id = $data->id;
-            }
-
-            $this->writeCsv($file, $csv_data, $first);
-        }
-
-        $this->downloadCsv($file);
     }
 
-    private function writeCsv($file, $data, $first = false)
-    {
-        if ($first) {
-            $fp = fopen($file, 'w');
-            fwrite($fp,chr(0xEF).chr(0xBB).chr(0xBF)); //Windows下使用BOM来标记文本文件的编码方式
-        } else {
-            $fp = fopen($file, 'a+');
-        }
-
-        foreach ($data as $line) {
-            foreach ($line as $k => $v) {
-                if ($k === 'url') {
-                    unset($line[$k]);
-                }
-            }
-            fputcsv($fp, $line);
-        }
-
-        fclose($fp);
-        return true;
-    }
-
-    private function downloadCsv($file)
-    {
-        set_time_limit(0);  //大文件在读取内容未结束时会被超时处理，导致下载文件不全。
-
-        $fpath = $file;
-        $file_pathinfo = pathinfo($fpath);
-        $file_name = $file_pathinfo['basename'];
-        $handle = fopen($fpath,"rb");
-        if (FALSE === $handle)
-            exit("Failed to open the file");
-        $filesize = filesize($fpath);
-
-        header("Content-type:application/force-download");//更具不同的文件类型设置header输出类型
-        header("Accept-Ranges:bytes");
-        header("Accept-Length:".$filesize);
-        header("Content-Disposition: attachment; filename=".$file_name);
-
-        while (!feof($handle)) {
-            $contents = fread($handle, 8192);
-            echo $contents;
-            @ob_flush();  //把数据从PHP的缓冲中释放出来
-            flush();      //把被释放出来的数据发送到浏览器
-        }
-        fclose($handle);
-        unlink($fpath);
-        die;
-    }
 }

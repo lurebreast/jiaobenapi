@@ -24,6 +24,9 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
         window.location.href = "<?= $this->url->get('typedata/moveTypedata?ids=') ?>" + ids + '&type=' + type;
     }
 
+
+    interval = null;
+
     function exportSend() {
         $.getJSON(
             '<?php echo $this->url->get('typedata/outdata');?>',
@@ -38,6 +41,25 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
                 if (result.code != 200) {
                     alert(result.msg);
                     window.location.reload();
+                }
+            }
+        );
+
+        interval = setInterval("exportCheck()", 1000)
+    }
+
+    function exportCheck(typeid) {
+        $.getJSON(
+            '<?php echo $this->url->get('typedata/ajax_export_process');?>',{typeid: $("#typeid").val()}, function(result){
+                $("#export_percent").html(result.percent);
+                if (result.lock == 0) {
+                    var download_link = '导出文件列表 ';
+                    $.each(result.files, function(index, href){
+                        download_link += '<a href="/files/' + href + '" class="btn btn-sm btn-success">' + href + '</a>&nbsp;&nbsp;';
+                    })
+
+                    $("#export_download").append(download_link);
+                    clearInterval(interval);
                 }
             }
         );
@@ -146,18 +168,10 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">添加项目</h4>
+                <h4 class="modal-title" id="myModalLabel">正在导出</h4>
+                <span id="export_percent"></span>%
+                <div id="export_download"></div>
             </div>
-            <form class="form-horizontal" role="form" method="post" action="<?= $this->url->get('typedata/typeadd') ?>">
-                <input type="hidden" name="<?= $this->security->getTokenKey() ?>" value="<?= $this->security->getToken() ?>"/>
-                <div class="form-group">
-                    <label class="col-xs-2 control-label">项目名称：</label>
-                    <div class="col-xs-10">
-                        <input type="text" name="typename" placeholder="项目名称" class="form-control" required=""  value="">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-flat btn-info btn-lg btn-block">提交</button>
-            </form>
         </div>
     </div>
 </div>

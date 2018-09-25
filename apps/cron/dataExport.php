@@ -29,7 +29,7 @@ if (mysqli_connect_errno()) {
 
 $json = $redis->lPop('data_export');
 
-$json = '{"_url":"\/typedata\/outdata","typeid":"44","status":"0","sttime":"","endtime":""}';
+//$json = '{"_url":"\/typedata\/outdata","typeid":"44","status":"0","sttime":"","endtime":""}';
 if (!$json) {
     $mysqli->close();
     $redis->close();
@@ -37,6 +37,9 @@ if (!$json) {
 }
 
 $arr = json_decode($json, true);
+
+$res = $mysqli->query("select typename from type where typeid='{$arr['typeid']}'");
+$typename = $res->fetch_assoc()['typename'];
 
 $where = "tid={$arr['typeid']}";
 $arr['status'] && $where .= " and status={$arr['status']}";
@@ -62,13 +65,17 @@ $redis->hset('data_export_'.$arr['typeid'], 'complete', $times);
 
 $id = 0;
 
-$fileInc = 0;
-for ($i = 0; $i < $times; $i++) {
 
+$fileInc = 0;
+$file_arr = [];
+for ($i = 0; $i < $times; $i++) {
     if ($i % $limitMerge === 0) {
         $fileInc++;
-        $file = '/tmp/data_'.$arr['typeid'].'_'.$fileInc.'.csv';
-        $fp = fopen($file, 'w');
+        $file = 'data_'.$arr['typeid'].'_'.$fileInc.'.csv';
+        $dir = __DIR__ . '/../../public/files/';
+        $file_arr[] = $file;
+
+        $fp = fopen($dir.$file, 'w');
         fwrite($fp,chr(0xEF).chr(0xBB).chr(0xBF)); //Windows下使用BOM来标记文本文件的编码方式
         fputcsv($fp, [
             '序号',
@@ -97,7 +104,7 @@ for ($i = 0; $i < $times; $i++) {
             $row['orderid'],
             $row['status'] == 1 ? '未提取' : '已提取',
             $row['tid'],
-            $row['tid'], //
+            $typename, //
             $row['img'] ? 'http://47.99.122.175/'.$row['img'] : '',
             $row['img1'] ? 'http://47.99.122.175/'.$row['img1'] : '',
             date('Y-m-d H:i:s', $row['creattime']),
@@ -108,9 +115,12 @@ for ($i = 0; $i < $times; $i++) {
         $id = $row['id'];
     }
 
-    $redis->hset('data_export_'.$arr['typeid'], 'rate', $i);
+    $redis->hset('data_export_'.$arr['typeid'], 'percent', round(($i + 1) / $times, 2) * 100);
+
+    sleep(1);
 }
 
 $redis->hset('data_export_'.$arr['typeid'], 'lock', 0);
+$redis->hset('data_export_'.$arr['typeid'], 'files', json_encode($file_arr));
 $redis->close();
 $mysqli->close();
