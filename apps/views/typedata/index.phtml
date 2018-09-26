@@ -58,6 +58,7 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
                         download_link += '<a href="/files/' + href + '" class="btn btn-sm btn-success">' + href + '</a>&nbsp;&nbsp;';
                     })
 
+                    $("#export_download").html('');
                     $("#export_download").append(download_link);
                     clearInterval(interval);
                 }

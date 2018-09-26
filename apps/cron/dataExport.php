@@ -29,7 +29,7 @@ if (mysqli_connect_errno()) {
 
 $json = $redis->lPop('data_export');
 
-//$json = '{"_url":"\/typedata\/outdata","typeid":"44","status":"0","sttime":"","endtime":""}';
+//$json = '{"_url":"\/typedata\/outdata","typeid":"43","status":"0","sttime":"","endtime":""}';
 if (!$json) {
     $mysqli->close();
     $redis->close();
@@ -55,16 +55,26 @@ if (!empty($arr['data_unique'])) {
 $res = $mysqli->query($sql);
 $total = $res->fetch_assoc()['total'];
 
-$limit = 2;
-$limitMerge = 20;
+$limit = 1000;
+$limitMerge = 300;
 
 $times = ceil($total / $limit);
 $fileMax = ceil($total / 20);
 
 $redis->hset('data_export_'.$arr['typeid'], 'complete', $times);
 
-$id = 0;
+$sql = "select id from typedata where $where";
+if (!empty($arr['data_unique'])) {
+    $sql .= " group by data";
+};
 
+$sql .= " order by id desc";
+
+$res = $mysqli->query($sql);
+
+$maxId = (int)$res->fetch_assoc()['id'] + 1; // 包含当前行
+
+$id = 0;
 
 $fileInc = 0;
 $file_arr = [];
@@ -90,14 +100,14 @@ for ($i = 0; $i < $times; $i++) {
         ]);
     }
 
-    $sql = "select * from typedata where id>{$id} and $where";
+    $sql = "select * from typedata where id<".$maxId." and $where";
     if (!empty($arr['data_unique'])) {
         $sql .= " group by data";
     }
 
-    $sql .= " limit $limit";
-    echo $sql."\n";
+    $sql .= " order by id desc limit $limit";
 
+    echo $sql."\n";
     $res = $mysqli->query($sql);
     while($row = $res->fetch_assoc()) {
         fputcsv($fp, [
@@ -112,12 +122,13 @@ for ($i = 0; $i < $times; $i++) {
             $row['data'],
         ]);
 
-        $id = $row['id'];
+        $maxId = $row['id'];
     }
 
     $redis->hset('data_export_'.$arr['typeid'], 'percent', round(($i + 1) / $times, 2) * 100);
 
-    sleep(1);
+    usleep(200000);
+//    sleep(1);
 }
 
 $redis->hset('data_export_'.$arr['typeid'], 'lock', 0);

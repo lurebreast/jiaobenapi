@@ -333,8 +333,8 @@ class TypedataController  extends \ControllerAd{
         }
 
         if ($redis->hget('data_export_'.$search['typeid'], 'lock')) {
-            $json['code'] = 500;
-            $json['msg'] = '该项目导出，请等等导出完成';
+//            $json['code'] = 500;
+//            $json['msg'] = '该项目导出，请等等导出完成';
         }
 
         echo json_encode($json);
