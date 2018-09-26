@@ -115,8 +115,8 @@ for ($i = 0; $i < $times; $i++) {
             $row['status'] == 1 ? '未提取' : '已提取',
             $row['tid'],
             $typename, //
-            $row['img'] ? 'http://47.99.122.175/'.$row['img'] : '',
-            $row['img1'] ? 'http://47.99.122.175/'.$row['img1'] : '',
+            $row['img'] ? 'http://47.99.122.175'.$row['img'] : '',
+            $row['img1'] ? 'http://47.99.122.175'.$row['img1'] : '',
             date('Y-m-d H:i:s', $row['creattime']),
             $row['updatetime'] ? date('Y-m-d H:i:s', $row['updatetime']) : '',
             $row['data'],
