@@ -244,8 +244,6 @@ class ApiController extends \ControllerBase
         die();
     }
     public function ssussess($msg){
-
-        file_put_contents('/tmp/acc.log', date('Y-m-d H:i:s').' '.$_SERVER['REQUEST_URI'].' '.$msg."\n", FILE_APPEND|LOCK_EX);
         $msg = $this->trimall($msg);
         echo 'OK|'.$msg;
         die();
@@ -254,6 +252,5 @@ class ApiController extends \ControllerBase
         $qian=array("\n","\r");
         return str_replace($qian, '', $str);
     }
-
 
 }

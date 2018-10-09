@@ -228,6 +228,16 @@ class TypedataController  extends \ControllerAd{
                     $this->modelsManager->createQuery("DELETE FROM Typedata WHERE tid = {$id}")->execute();
                     $this->modelsManager->createQuery("DELETE FROM TypedataRecycle WHERE tid = {$id}")->execute();
                     $typename .= $types->typename.',';
+
+                    // 删除图片
+                    array_map(function($v){
+                        unlink($v);
+                    }, glob(getcwd().'/images/'.$id.'_*.png'));
+
+                    // 删除redis缓存
+                    $redis = $this->getRedis();
+                    $redis->del("tid_orderid_".$id);
+                    $redis->del("increment_order_id_".$id.'_2');
                 }
             }
         }
