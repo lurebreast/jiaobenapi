@@ -8,7 +8,9 @@ $http->set(array(
     'worker_num' => 8,
     'max_request' => 1000,
     'dispatch_mode' => 1,
-    'pid_file' => '/tmp/swoole.pid',
+    'user' => 'www',
+    'group' => 'www',
+    'pid_file' => '/var/log/swoole.pid',
 ));
 $http->on("start", function ($server) {
     echo "Swoole http server is started at http://127.0.0.1:9501\n";
