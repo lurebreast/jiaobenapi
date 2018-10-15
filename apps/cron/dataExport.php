@@ -6,8 +6,116 @@
  * Time: 16:03
  */
 
+
+require __DIR__.'/../../libs/PHPExcel/PHPExcel.php';
+
+error_reporting(E_ALL);
 ini_set('memory_limit','4096M');
-ini_set('display_errors','On');
+ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);
+
+define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+
+
+$data = [
+    ['goods_id' => 1322, 'goods_sn' => 'Index(0)->getStyle(\'A\')->getAlignment()->setHorizontal(\PHPExcel_Style_Al', 'goods_name' => 3, 'barcode' => 4, 'goods_type' => 5, 'price' => 6, 'aa' => 7, 'bb' => 8],
+    ['goods_id' => 1322, 'goods_sn' => 'Index(0)->getStyle(\'A\')->getAlignment()->setHorizontal(\PHPExcel_Style_Al', 'goods_name' => 3, 'barcode' => 4, 'goods_type' => 5, 'price' => 6, 'aa' => 7, 'bb' => 8],
+];
+$objPHPExcel = new \PHPExcel();
+
+$objWriter = new \PHPExcel_Writer_Excel2007($objPHPExcel);
+
+$objActSheet = $objPHPExcel->getActiveSheet();
+
+// 水平居中（位置很重要，建议在最初始位置）
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('A')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('B1')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('C')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('D')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('E')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('F')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('G')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+$objPHPExcel->setActiveSheetIndex(0)->getStyle('H')->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+$objActSheet->setCellValue('A1', '商品货号');
+$objActSheet->setCellValue('B1', '商品名称');
+$objActSheet->setCellValue('C1', '商品图');
+$objActSheet->setCellValue('D1', '商品图');
+$objActSheet->setCellValue('E1', '商品条码');
+$objActSheet->setCellValue('F1', '报价(港币)');
+$objActSheet->setCellValue('G1', '商品属性');
+
+// 设置个表格宽度
+$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(16);
+$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(16);
+$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(23);
+$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(23);
+$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(12);
+$objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(12);
+
+// 垂直居中
+$objPHPExcel->getActiveSheet()->getStyle('A')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+$objPHPExcel->getActiveSheet()->getStyle('B')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+$objPHPExcel->getActiveSheet()->getStyle('D')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+$objPHPExcel->getActiveSheet()->getStyle('E')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+$objPHPExcel->getActiveSheet()->getStyle('F')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+$objPHPExcel->getActiveSheet()->getStyle('G')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+foreach($data as $k=>$v){
+    $k +=1;
+    $objActSheet->setCellValue('A'.$k, $v['goods_sn']);
+    $objActSheet->setCellValue('B'.$k, $v['goods_name']);
+
+    // 图片生成
+    $objDrawing[$k] = new \PHPExcel_Worksheet_Drawing();
+    $objDrawing[$k]->setPath('3448_7543_0.png');
+    // 设置宽度高度
+    $objDrawing[$k]->setHeight(400);//照片高度
+    $objDrawing[$k]->setWidth(150); //照片宽度
+    /*设置图片要插入的单元格*/
+    $objDrawing[$k]->setCoordinates('C'.$k);
+    // 图片偏移距离
+    $objDrawing[$k]->setOffsetX(6);
+    $objDrawing[$k]->setOffsetY(6);
+    $objDrawing[$k]->setWorksheet($objPHPExcel->getActiveSheet());
+    // 图片生成
+    $objDrawing[$k] = new \PHPExcel_Worksheet_Drawing();
+    $objDrawing[$k]->setPath('3448_7543_0.png');
+    // 设置宽度高度
+    $objDrawing[$k]->setHeight(400);//照片高度
+    $objDrawing[$k]->setWidth(150); //照片宽度
+    /*设置图片要插入的单元格*/
+    $objDrawing[$k]->setCoordinates('D'.$k);
+    // 图片偏移距离
+    $objDrawing[$k]->setOffsetX(6);
+    $objDrawing[$k]->setOffsetY(6);
+    $objDrawing[$k]->setWorksheet($objPHPExcel->getActiveSheet());
+
+    // 表格内容
+    $objActSheet->setCellValue('E'.$k, $v['goods_type']);
+    $objActSheet->setCellValue('F'.$k, $v['price']);
+    $objActSheet->setCellValue('G'.$k, $v['aa']);
+
+    // 表格高度
+    $objActSheet->getRowDimension($k)->setRowHeight(240);
+
+}
+
+$fileName = '报价表';
+$date = date("Y-m-d",time());
+$fileName .= "_{$date}.xls";
+$fileName = iconv("utf-8", "gb2312", $fileName);
+//重命名表
+// $objPHPExcel->getActiveSheet()->setTitle('test');
+//设置活动单指数到第一个表,所以Excel打开这是第一个表
+$objPHPExcel->setActiveSheetIndex(0);
+$objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+$objWriter->save('aa.xls');
+
+var_dump('ff');
+die;
+
 
 $redis = new Redis();
 $redis->pconnect('127.0.0.1');
