@@ -268,6 +268,40 @@ class TypedataController  extends \ControllerAd{
         $this->response->redirect('typedata/typead?recycle=1');
     }
 
+    public function status1Action(){
+        $typeid = $this->request->get('typeid');
+        $typeid = explode(',', $typeid);
+
+        foreach ($typeid as $id) {
+            $id = intval($id);
+
+            $typedata = new \Typedata();
+            $con = $typedata->getWriteConnection();
+
+            $con->query("UPDATE typedata SET status = 1, updatetime=".time()." WHERE tid = ".$id);
+        }
+
+        $this->flashSession->success('操作成功');
+        $this->response->redirect('typedata/typead');
+    }
+
+    public function status2Action(){
+        $typeid = $this->request->get('typeid');
+        $typeid = explode(',', $typeid);
+
+        foreach ($typeid as $id) {
+            $id = intval($id);
+
+            $typedata = new \Typedata();
+            $con = $typedata->getWriteConnection();
+
+            $con->query("UPDATE typedata SET status = 2, updatetime=".time()." WHERE tid = ".$id);
+        }
+
+        $this->flashSession->success('操作成功');
+        $this->response->redirect('typedata/typead');
+    }
+
     public function deldataAction(){
         $typeid = $this->request->get('id');
         $typeid = intval($typeid);

@@ -55,6 +55,8 @@
                 <?php else:?>
                     <a onclick="edittype(<?= $item->typeid;?>)"  data-toggle="modal" data-target="#myModal" id="data_<?= $item->typeid;?>" class="btn btn-sm btn-success">修改</a>
                     <a href="<?= $this->url->get('typedata/recycletype?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">移至回收站</a>
+                    <a href="<?= $this->url->get('typedata/status1?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">更新为未提取</a>
+                    <a href="<?= $this->url->get('typedata/status2?typeid='.$item->typeid) ?>" class="btn btn-sm btn-danger delete">更新为已提取</a>
                 <?php endif;?>
             </td>
         </tr>
@@ -67,6 +69,8 @@
                     <button class="btn btn-sm btn-danger delete" onclick="batchAll('cleardata');">清除数据</button>
             <?php else:?>
                 <button class="btn btn-sm btn-danger delete" onclick="batchAll('recycletype');">移至回收站</button>
+                <button class="btn btn-sm btn-danger delete" onclick="batchAll('status1');">更新为未提取</button>
+                <button class="btn btn-sm btn-danger delete" onclick="batchAll('status2');">更新为已提取</button>
             <?php endif;?>
         </td>
     </tr>
