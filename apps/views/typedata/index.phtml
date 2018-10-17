@@ -27,7 +27,7 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
 
     interval = null;
 
-    function exportSend() {
+    function exportSend(image_file) {
         $.getJSON(
             '<?php echo $this->url->get('typedata/outdata');?>',
             {
@@ -35,7 +35,8 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
                 status: $("#status").val(),
                 sttime: $("#sttime").val(),
                 endtime: $("#endtime").val(),
-                data_unique: $("#data_unique:checked").val()
+                data_unique: $("#data_unique:checked").val(),
+                image_file: image_file
             },
             function(result){
                 if (result.code != 200) {
@@ -73,8 +74,8 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
         <a data-toggle="modal" data-target="#myModal" id="data" href="" class="btn btn-sm btn-success">添加项目</a>
     <?php endif;?>
     <?php if ($superAdmin):?>
-        <!--<a href="<?/*= $this->url->get('typedata/outdata?status='.$search['status'].'&typeid='.$search['typeid'].'&sttime='.$search['sttime'].'&endtime='.$search['endtime'])."&data_unique=".$search['data_unique'].'&target='.$search['target'];*/?>" title="导出" class="btn btn-sm btn-success">导出</a>-->
-        <a onclick="exportSend();" href="" data-toggle="modal" data-target="#modal_export" class="btn btn-sm btn-success">导出</a>
+        <a onclick="exportSend(0);" href="" data-toggle="modal" data-target="#modal_export" class="btn btn-sm btn-success">导出(图片地址)</a>
+        <a onclick="exportSend(1);" href="" data-toggle="modal" data-target="#modal_export" class="btn btn-sm btn-success">导出(图片内容)</a>
     <?php endif;?>
 </div>
 <form class="navbar-form navbar-left" action="<?= $this->url->get('typedata/index')?>" method="get" role="form">

@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/6/6
- * Time: 16:03
- */
 
+error_reporting(E_ALL);
 ini_set('memory_limit','4096M');
-ini_set('display_errors','On');
+ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);
+define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+
+require __DIR__.'/../../libs/PHPExcel/PHPExcel.php';
 
 $redis = new Redis();
 $redis->pconnect('127.0.0.1');
@@ -29,10 +28,11 @@ if (mysqli_connect_errno()) {
 
 $json = $redis->lPop('data_export');
 
-//$json = '{"_url":"\/typedata\/outdata","typeid":"43","status":"0","sttime":"","endtime":""}';
+//$json = '{"_url":"\/typedata\/outdata","typeid":"3448","status":"0","sttime":"","endtime":"","image_file":"0"}';
 if (!$json) {
     $mysqli->close();
     $redis->close();
+    echo '没有需要导出的数据'.PHP_EOL;
     die;
 }
 
@@ -56,10 +56,9 @@ $res = $mysqli->query($sql);
 $total = $res->fetch_assoc()['total'];
 
 $limit = 1000;
-$limitMerge = 300;
+$limitMerge = $arr['image_file'] ? 30 : 300; // 导出图片3万一个文件 图片地址30万一个文件 = $limit x $limitMerge
 
 $times = ceil($total / $limit);
-$fileMax = ceil($total / 20);
 
 $redis->hset('data_export_'.$arr['typeid'], 'complete', $times);
 
@@ -76,28 +75,34 @@ $maxId = (int)$res->fetch_assoc()['id'] + 1; // 包含当前行
 
 $id = 0;
 
-$fileInc = 0;
+$fileInc = 1;
 $file_arr = [];
 for ($i = 0; $i < $times; $i++) {
     if ($i % $limitMerge === 0) {
-        $fileInc++;
-        $file = 'data_'.$arr['typeid'].'_'.$fileInc.'.csv';
-        $dir = __DIR__ . '/../../public/files/';
-        $file_arr[] = $file;
+        var_dump(__LINE__);
+        $k = 1;
 
-        $fp = fopen($dir.$file, 'w');
-        fwrite($fp,chr(0xEF).chr(0xBB).chr(0xBF)); //Windows下使用BOM来标记文本文件的编码方式
-        fputcsv($fp, [
-            '序号',
-            '提取',
-            '项目id',
-            '项目名称',
-            '图片',
-            '图片1',
-            '上传时间',
-            '更新时间',
-            '数据',
-        ]);
+        $objPHPExcel = new \PHPExcel();
+        $objWriter = new \PHPExcel_Writer_Excel2007($objPHPExcel);
+        $objActSheet = $objPHPExcel->getActiveSheet();
+
+        $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_discISAM;
+        if (!\PHPExcel_Settings::setCacheStorageMethod($cacheMethod)) {
+            die($cacheMethod . " 缓存方法不可用" . EOL);
+        }
+
+        $objActSheet->setCellValue('A1', '序号');
+        $objActSheet->setCellValue('B1', '提取');
+        $objActSheet->setCellValue('C1', '项目id');
+        $objActSheet->setCellValue('D1', '项目名称');
+        $objActSheet->setCellValue('E1', '图片');
+        $objActSheet->setCellValue('F1', '图片1');
+        $objActSheet->setCellValue('G1', '上传时间');
+        $objActSheet->setCellValue('H1', '更新时间');
+        $objActSheet->setCellValue('I1', '数据');
+// 设置个表格宽度
+        $objActSheet->getColumnDimension('E')->setWidth(30);
+        $objActSheet->getColumnDimension('F')->setWidth(30);
     }
 
     $sql = "select * from typedata where id<".$maxId." and $where";
@@ -110,26 +115,86 @@ for ($i = 0; $i < $times; $i++) {
     echo $sql."\n";
     $res = $mysqli->query($sql);
     while($row = $res->fetch_assoc()) {
-        fputcsv($fp, [
-            $row['orderid'],
-            $row['status'] == 1 ? '未提取' : '已提取',
-            $row['tid'],
-            $typename, //
-            $row['img'] ? 'http://47.99.122.175'.$row['img'] : '',
-            $row['img1'] ? 'http://47.99.122.175'.$row['img1'] : '',
-            date('Y-m-d H:i:s', $row['creattime']),
-            $row['updatetime'] ? date('Y-m-d H:i:s', $row['updatetime']) : '',
-            $row['data'],
-        ]);
+        $k +=1;
+
+        $objActSheet->setCellValue('A'.$k, $row['orderid']);
+        $objActSheet->setCellValue('B'.$k, $row['status'] == 1 ? '未提取' : '已提取');
+        $objActSheet->setCellValue('C'.$k, $row['tid']);
+        $objActSheet->setCellValue('D'.$k, $typename);
+
+//        $row['img'] = $row['img1'] = '';
+        if ($arr['image_file']) {
+            // 图片生成
+            $image_dir = __DIR__ . '/../../public';
+            if ($row['img'] && file_exists($image_dir.$row['img'])) {
+                $objDrawing[$k] = new \PHPExcel_Worksheet_Drawing();
+                $objDrawing[$k]->setPath($image_dir.$row['img']);
+                // 设置宽度高度
+                $objDrawing[$k]->setHeight(400);//照片高度
+                $objDrawing[$k]->setWidth(200); //照片宽度
+                /*设置图片要插入的单元格*/
+                $objDrawing[$k]->setCoordinates('E'.$k);
+                // 图片偏移距离
+                $objDrawing[$k]->setOffsetX(6);
+                $objDrawing[$k]->setOffsetY(6);
+                $objDrawing[$k]->setWorksheet($objPHPExcel->getActiveSheet());
+            } else {
+                $objActSheet->setCellValue('E'.$k, '');
+            }
+            if ($row['img1'] && file_exists($image_dir.$row['img1'])) {
+                $objDrawing[$k] = new \PHPExcel_Worksheet_Drawing();
+                $objDrawing[$k]->setPath($image_dir.$row['img1']);
+                // 设置宽度高度
+                $objDrawing[$k]->setHeight(400);//照片高度
+                $objDrawing[$k]->setWidth(200); //照片宽度
+                /*设置图片要插入的单元格*/
+                $objDrawing[$k]->setCoordinates('F'.$k);
+                // 图片偏移距离
+                $objDrawing[$k]->setOffsetX(6);
+                $objDrawing[$k]->setOffsetY(6);
+                $objDrawing[$k]->setWorksheet($objPHPExcel->getActiveSheet());
+            } else {
+                $objActSheet->setCellValue('F'.$k, '');
+            }
+        } else {
+            $objActSheet->setCellValue('E'.$k, ($row['img'] ? 'http://47.99.122.175'.$row['img'] : ''));
+            $objActSheet->setCellValue('F'.$k, ($row['img1'] ? 'http://47.99.122.175'.$row['img1'] : ''));
+        }
+
+        $objActSheet->setCellValue('G'.$k, date('Y-m-d H:i:s', $row['creattime']));
+        $objActSheet->setCellValue('H'.$k, $row['updatetime'] ? date('Y-m-d H:i:s', $row['updatetime']) : '');
+        $objActSheet->setCellValue('I'.$k, $row['data']);
+
+        // 表格高度
+        if ($arr['image_file']) {
+            $objActSheet->getRowDimension($k)->setRowHeight(300);
+        }
 
         $maxId = $row['id'];
+
+        echo floor((memory_get_peak_usage())/1024/1024)."MB".PHP_EOL;
+    }
+
+    $next = $i + 1;
+    if ($times == 1 || $next % $limitMerge === 0 || $next == $times) { // 只有一次 正常多次 最后一次
+
+        $file = 'data_'.$arr['typeid'].'_'.$fileInc.'.xlsx';
+        $dir = __DIR__ . '/../../public/files/';
+        $file_arr[] = $file;
+
+        $objPHPExcel->setActiveSheetIndex(0);
+        $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save($dir.$file);
+
+        $fileInc++;
     }
 
     $redis->hset('data_export_'.$arr['typeid'], 'percent', round(($i + 1) / $times, 2) * 100);
 
     usleep(200000);
-//    sleep(1);
 }
+
+echo " 导出完成".json_encode($file_arr).PHP_EOL;
 
 $redis->hset('data_export_'.$arr['typeid'], 'lock', 0);
 $redis->hset('data_export_'.$arr['typeid'], 'files', json_encode($file_arr));
