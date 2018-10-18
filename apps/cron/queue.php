@@ -41,7 +41,6 @@ if ($json) {
 }
 
 $tid = $redis->lPop('tid_status1');
-$tid = 3448;
 if ($tid) {
     require __DIR__.'/updateTypeDataStatus.php';
     die;
