@@ -1,41 +1,5 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('memory_limit','4096M');
-ini_set('display_errors', TRUE);
-ini_set('display_startup_errors', TRUE);
-define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
-
-require __DIR__.'/../../libs/PHPExcel/PHPExcel.php';
-
-$redis = new Redis();
-$redis->pconnect('127.0.0.1');
-
-$config = include_once __DIR__.'/../config/config.php';
-$host = $config['database']['host'].":".$config['database']['port'];
-$user = $config['database']['username'];
-$pwd = $config['database']['password'];
-$db = $config['database']['dbname'];
-
-$mysqli = new mysqli($host, $user, $pwd, $db);
-
-//如果连接错误
-if (mysqli_connect_errno()) {
-    error_log("连接数据库失败：" . mysqli_connect_error());
-    $mysqli = null;
-    die;
-}
-
-$json = $redis->lPop('data_export');
-
-//$json = '{"_url":"\/typedata\/outdata","typeid":"3448","status":"0","sttime":"","endtime":"","image_file":"1"}';
-if (!$json) {
-    $mysqli->close();
-    $redis->close();
-    echo '没有需要导出的数据'.PHP_EOL;
-    die;
-}
-
 $arr = json_decode($json, true);
 
 $res = $mysqli->query("select typename from type where typeid='{$arr['typeid']}'");
@@ -60,7 +24,6 @@ $limitMerge = $arr['image_file'] ? 30 : 300; // 导出图片3万一个文件 图
 
 $times = ceil($total / $limit);
 
-
 //$limit = 1;
 //$times = 2;
 
@@ -71,7 +34,7 @@ if (!empty($arr['data_unique'])) {
     $sql .= " group by data";
 };
 
-$sql .= " order by id desc";
+$sql .= " order by id desc limit 1";
 
 $res = $mysqli->query($sql);
 

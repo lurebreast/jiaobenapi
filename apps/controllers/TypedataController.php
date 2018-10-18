@@ -262,6 +262,7 @@ class TypedataController  extends \ControllerAd{
             $con->query("UPDATE type SET is_delete = 0, updatetime=".time()." WHERE typeid = ".$id);
             $con->query("insert into typedata select * from typedata_recycle where tid=$id");
             $con->query("delete from typedata_recycle where tid=$id");
+
         }
 
         $this->flashSession->success('操作成功');
@@ -275,13 +276,10 @@ class TypedataController  extends \ControllerAd{
         foreach ($typeid as $id) {
             $id = intval($id);
 
-            $typedata = new \Typedata();
-            $con = $typedata->getWriteConnection();
-
-            $con->query("UPDATE typedata SET status = 1, updatetime=".time()." WHERE tid = ".$id);
+            $this->getRedis()->lPush('tid_status1', $id);
         }
 
-        $this->flashSession->success('操作成功');
+        $this->flashSession->success('操作成功, 等待后台执行完成');
         $this->response->redirect('typedata/typead');
     }
 
@@ -296,6 +294,10 @@ class TypedataController  extends \ControllerAd{
             $con = $typedata->getWriteConnection();
 
             $con->query("UPDATE typedata SET status = 2, updatetime=".time()." WHERE tid = ".$id);
+
+            // 删除redis队列
+            $redis = $this->getRedis();
+            $rs = $redis->del("tid_orderid_".$id);
         }
 
         $this->flashSession->success('操作成功');
