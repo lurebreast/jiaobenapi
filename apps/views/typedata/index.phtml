@@ -91,7 +91,7 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
             <option value='1'<?php if ($search['status'] === '1') echo 'selected'?>>未提取</option>
             <option value="2"<?php if ($search['status'] == '2') echo 'selected'?>>已提取</option>
         </select>
-        上传时间<input id="sttime"  class="form-control" name="sttime"  placeholder="开始日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['sttime'];?>" style="width: 142px;">
+        上传时间<input id="sttime"  class="form-control" name="sttime"  placeholder="开始日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['sttime'] ? $search['sttime'] : date('Y-m-d 00:00:00');?>" style="width: 142px;">
         -<input id="endtime" class="form-control" name="endtime"  placeholder="结束日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['endtime'];?>" style="width: 142px;">
         数据去重<input id="data_unique" name='data_unique' type="checkbox" <? if (!empty($search['data_unique'])) echo 'checked'?> value="1"/>
         <input type="hidden" name="target" value="<?=$search['target'] ?>">
