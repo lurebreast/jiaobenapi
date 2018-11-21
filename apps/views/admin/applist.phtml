@@ -1,0 +1,73 @@
+<div class="pd2 cf">
+    <h4 class="fl">app管理</h4>
+    <a data-toggle="modal" data-target="#myModal" id="data" href="" class="btn btn-sm btn-success">添加app包</a>
+</div>
+<table class="table table-bordered text-left table-hover">
+    <thead>
+    <tr>
+        <th width="64">ID</th>
+        <th width="450">文件地址</th>
+        <th width="220">说明</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($page->items as $item):?>
+        <tr>
+            <td><?= $item->id;?></td>
+            <td><input type="text" class="form-control" value="<?= 'http://'.$_SERVER['SERVER_ADDR'].$item->file_path;?>" disabled/></td>
+            <td><input type="text" class="form-control" value="<?= $item->remark;?>" id="remark_<?= $item->id?>"/></td>
+            <td>
+                <button class="btn btn-sm btn-success delete" onclick="save('<?= $item->id?>');">修改</button>
+                <button class="btn btn-sm btn-danger delete" onclick="del('<?= $item->id?>');">删除</button>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+<?php $this->partial("common/pages", array('url' => 'admin/adminlist?page=', 'page' => $page)) ?>
+<script type="text/javascript">
+    function save(id) {
+        $.post('/admin/appsave', {id: id, remark:$("#remark_" + id).val()}, function(res) {
+            if (res.code == 200) {
+                alert(res.data);
+            } else {
+                alert(res.msg);
+            }
+        }, 'json')
+    }
+    function del(id) {
+        $.post('/admin/appdel', {id: id}, function(res) {
+            alert(res.data);
+            location.reload(true);
+        }, 'json')
+    }
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form class="form-horizontal" role="form" method="post" action="<?= $this->url->get('admin/appadd') ?>" enctype="multipart/form-data">
+                <input type="hidden" name="<?= $this->security->getTokenKey() ?>" value="<?= $this->security->getToken() ?>"/>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">添加app包</h4>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">文件</label>
+                    <div class="col-xs-10">
+                        <input type="file" name="app_file" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-2 control-label">备注</label>
+                    <div class="col-xs-10">
+                        <input type="text" name="remark" class="form-control" value="">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-flat btn-info btn-lg btn-block">提交</button>
+            </form>
+        </div>
+    </div>
+</div>

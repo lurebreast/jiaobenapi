@@ -1,1 +1,5 @@
-update cy_admin set id=2 where id=3;
+create table app_files(
+    id int(10) unsigned not null primary key auto_increment comment '自增主键',
+    file_path varchar(32) not null default '' comment 'web文件路径',
+    remark varchar(32) default '' comment '包备注'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

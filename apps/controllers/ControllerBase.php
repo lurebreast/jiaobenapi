@@ -179,4 +179,26 @@ abstract class ControllerBase extends \Phalcon\Mvc\Controller
 
         return $redis;
     }
+
+    protected function ajaxSuccess($data)
+    {
+        $result = [
+            'code' => 200,
+            'data' => $data,
+            'msg' => '',
+        ];
+
+        echo json_encode($result, JSON_UNESCAPED_UNICODE);die;
+    }
+
+    protected function ajaxError($msg)
+    {
+        $result = [
+            'code' => 500,
+            'data' => '',
+            'msg' => $msg,
+        ];
+
+        echo json_encode($result, JSON_UNESCAPED_UNICODE);die;
+    }
 }

@@ -122,6 +122,11 @@ function accessAllow($uri)
                             <i class="fa fa-angle-double-right" aria-hidden="true"></i>添加管理员
                         </a>
                     </li>
+                    <li class="<?php if($controller=='admin'&& $action=='applist'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('admin/applist') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>app包管理
+                        </a>
+                    </li>
                 </ul>
             </li>
             <?php endif;?>

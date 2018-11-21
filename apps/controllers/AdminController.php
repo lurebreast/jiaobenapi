@@ -102,4 +102,81 @@ class AdminController extends \ControllerBase
 
         $this->response->redirect('admin/adminlist');
     }
+
+    public function appaddAction()
+    {
+        $remark = $this->request->get('remark');
+        $typedata = new \AppFiles();
+        $con = $typedata->getWriteConnection();
+
+        if ($this->request->isPost() && $this->security->checkToken()) {
+            try {
+
+                if ($this->request->hasFiles() != true) {
+                    throw new \Exception('没有上传文件！');
+                }
+
+                foreach ($this->request->getUploadedFiles() as $file) {
+                    $file_path = '/files/app_'. uniqid().strrchr($file->getName(), '.');
+
+                    if ($file->moveTo($_SERVER['DOCUMENT_ROOT'].$file_path)) {
+                        $con->query("insert into app_files(file_path, remark) values('{$file_path}', '".addslashes($remark)."')");
+                    }
+                }
+
+                $this->flashSession->success('文件上传成功');
+                $this->response->redirect('admin/applist');
+            } catch (\Exception $e) {
+                $this->flashSession->error($e->getMessage());
+            }
+        }
+    }
+
+    public function appdelAction()
+    {
+        $id = $this->request->get('id', 'int', 1);
+        $file = AppFiles::findFirst($id);
+
+        if ($file) {
+            $file_path = $file->file_path;
+            unlink($_SERVER['DOCUMENT_ROOT'].$file_path);
+            $file->delete();
+
+            return $this->ajaxSuccess('操作成功');
+        } else {
+            return $this->ajaxError('数据不存在');
+        }
+    }
+
+    public function applistAction()
+    {
+        $page = $this->request->get('page', 'int', 1);
+        $list = $this->modelsManager->createBuilder()
+            ->from('AppFiles')
+            ->orderBy('id desc');
+
+        $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
+            "builder" => $list,
+            "limit" => 10,
+            "page" => $page
+        ));
+
+        $this->view->setVar("page", $paginator->getPaginate());
+    }
+
+    public function appsaveAction()
+    {
+        $id = $this->request->get('id', 'int', 1);
+        $remark = $this->request->get('remark');
+
+        $file = AppFiles::findFirst($id);
+
+        if ($file) {
+            $file->remark = $remark;
+            $file->save();
+            return $this->ajaxSuccess('操作成功');
+        } else {
+            return $this->ajaxError('数据不存在');
+        }
+    }
 }
