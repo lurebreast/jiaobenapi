@@ -1,6 +1,7 @@
+<script src="/static/js/clipboard.min.js"></script>
 <div class="pd2 cf">
     <h4 class="fl">app管理</h4>
-    <a data-toggle="modal" data-target="#myModal" id="data" href="" class="btn btn-sm btn-success">添加app包</a>
+    <a data-toggle="modal" data-target="#myModal" id="data" href="" class="btn btn-sm btn-success aaaaaa">添加app包</a>
 </div>
 <table class="table table-bordered text-left table-hover">
     <thead>
@@ -15,11 +16,12 @@
     <?php foreach ($page->items as $item):?>
         <tr>
             <td><?= $item->id;?></td>
-            <td><input type="text" class="form-control" value="<?= 'http://'.$_SERVER['SERVER_ADDR'].$item->file_path;?>" disabled/></td>
+            <td><input type="text" class="form-control" value="<?= 'http://'.$_SERVER['HTTP_HOST'].$item->file_path;?>" disabled/></td>
             <td><input type="text" class="form-control" value="<?= $item->remark;?>" id="remark_<?= $item->id?>"/></td>
             <td>
                 <button class="btn btn-sm btn-success delete" onclick="save('<?= $item->id?>');">修改</button>
                 <button class="btn btn-sm btn-danger delete" onclick="del('<?= $item->id?>');">删除</button>
+                <button class="btn btn-sm btn-success delete copy-app-file" data-clipboard-text="<?= 'http://'.$_SERVER['HTTP_HOST'].$item->file_path;?>">复制</button>
             </td>
         </tr>
     <?php endforeach; ?>
@@ -42,6 +44,16 @@
             location.reload(true);
         }, 'json')
     }
+
+    var clipboard = new ClipboardJS('.copy-app-file');
+    clipboard.on('success', function(e) {
+        $(e.trigger).html('已复制');
+        e.clearSelection();
+    });
+    clipboard.on('error', function(e) {
+        $(e.trigger).html('复制失败，请手动复制');
+    });
+
 </script>
 
 <!-- Modal -->
