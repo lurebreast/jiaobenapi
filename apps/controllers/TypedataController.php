@@ -155,19 +155,33 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("uid", $uid);
     }
     public function typeadAction(){
+
+        $page = $this->request->get('page', 'int', 1);
+        $list = $this->modelsManager->createBuilder()
+            ->from('Type');
+
         $recycle = !empty($this->request->get('recycle')) ? true : false;
-
-        $find = $recycle ? 'is_delete = 1' : 'is_delete = 0';
-
-        if (empty($this->admin['roles']['/typedata/index']) && $this->admin['roles']['allow_type']) {
-            $find .= ' and typeid in('.$this->admin['roles']['allow_type'].')';
+        if ($recycle) {
+            $list->where('Type.is_delete = 1');
         } else {
+            $list->where('Type.is_delete = 0');
         }
 
-        $typearr = \Type::find([$find, 'order' => 'typeid desc']);
+        if (empty($this->admin['roles']['/typedata/index']) && $this->admin['roles']['allow_type']) {
+            $list->andWhere('Type.typeid in('.$this->admin['roles']['allow_type'].')');
+        }
 
+        $list = $list->orderBy('typeid desc');
+
+
+        $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder(array(
+            "builder" => $list,
+            "limit" => 10,
+            "page" => $page
+        ));
+
+        $this->view->setVar("page", $paginator->getPaginate());
         $this->view->setVar("recycle", $recycle);
-        $this->view->setVar("type", $typearr);
     }
 
     public function edittypeAction(){
