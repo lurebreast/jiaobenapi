@@ -16,6 +16,8 @@ class TypedataController  extends \ControllerAd{
         $this->view->setVar("typearrs", $typearrs);
         //处理搜索
         $search = $this->request->get();
+
+        !isset($search['sttime']) && $this->isMobile() && $search['sttime'] = date('Y-m-d 00:00:00');
         foreach (['status', 'typeid', 'sttime', 'endtime', 'recycle', 'data_unique', 'target'] as $v) {
             !isset($search[$v]) && $search[$v] = null;
         }
