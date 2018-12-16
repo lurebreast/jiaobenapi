@@ -18,7 +18,7 @@ class TypedataController  extends \ControllerAd{
         $search = $this->request->get();
 
         !isset($search['sttime']) && $this->isMobile() && $search['sttime'] = date('Y-m-d 00:00:00');
-        foreach (['status', 'typeid', 'sttime', 'endtime', 'recycle', 'data_unique', 'target'] as $v) {
+        foreach (['status', 'typeid', 'sttime', 'endtime', 'recycle', 'data_unique', 'target', 'data'] as $v) {
             !isset($search[$v]) && $search[$v] = null;
         }
 
@@ -34,6 +34,9 @@ class TypedataController  extends \ControllerAd{
         }
         if (!empty($search['endtime'])){
             $where .= " and creattime < ".strtotime($search['endtime']);
+        }
+        if (!empty($search['data'])){
+            $where .= " and data like '%".$search['data']."%'";
         }
         if (!$this->typeAll) {
             $inTid = implode(',', array_keys($typearrs));
