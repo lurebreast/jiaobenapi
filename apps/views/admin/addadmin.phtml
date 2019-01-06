@@ -57,6 +57,15 @@
         <label class="col-xs-1"></label>
         <div class="col-xs-10">
             <label class="checkbox">
+                <input type="checkbox" name="roles[/typedata/index?export]" class="checkbox" value="1" <?php if(!empty($user['roles']['/typedata/index?export'])) echo "checked";?>>是否能导出数据
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-1"></label>
+        <div class="col-xs-10">
+            <label class="checkbox">
                 <input type="checkbox" name="roles[/typedata/dataadd]" class="checkbox" value="1" <?php if(!empty($user['roles']['/typedata/dataadd'])) echo "checked";?>>是否能上传数据
             </label>
         </div>
