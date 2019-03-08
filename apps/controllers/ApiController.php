@@ -33,7 +33,7 @@ class ApiController extends \ControllerBase
             if (!$newdata){
                 $this->serror('没有可用数据');
             } else {
-                $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));
+                $this->ssussess($this->responseData($newdata));
             }
         }
 
@@ -84,7 +84,7 @@ class ApiController extends \ControllerBase
             $newdata->updatetime = time();
 
             if ($newdata->save()){
-                $this->ssussess($newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime));
+                $this->ssussess($this->responseData($newdata));
             }else{
                 $this->serror('数据保存失败');
             }
@@ -251,6 +251,12 @@ class ApiController extends \ControllerBase
    public function trimall($str){
         $qian=array("\n","\r");
         return str_replace($qian, '', $str);
+    }
+
+    protected function responseData($newdata)
+    {
+        $host = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'];
+        return $newdata->id.'|'.$newdata->data.'|'.$newdata->tid.'|'.$newdata->orderid.'|'.date('Y-m-d H:i:s', $newdata->creattime).'|'.($newdata->img ? $host.$newdata->img : '').'|'.($newdata->img1 ? $host.$newdata->img1 : '');
     }
 
 }
