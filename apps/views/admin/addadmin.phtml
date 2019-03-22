@@ -75,6 +75,15 @@
         <label class="col-xs-1"></label>
         <div class="col-xs-10">
             <label class="checkbox">
+                <input type="checkbox" name="roles[/typedata/dataadd]" class="checkbox" value="1" <?php if(!empty($user['roles']['/typedata/imgadd'])) echo "checked";?>>是否能上传图片
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-1"></label>
+        <div class="col-xs-10">
+            <label class="checkbox">
                 <input type="checkbox" name="roles[/typedata/api]" class="checkbox" value="1" <?php if(!empty($user['roles']['/typedata/api'])) echo "checked";?> <?php if(!empty($user['roles']['/typedata/api'])) echo "checked";?>>是否能查看接口文档
             </label>
         </div>

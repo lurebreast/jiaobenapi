@@ -124,6 +124,7 @@ class TypedataController  extends \ControllerAd{
 
         $exce = false;
         if ($this->request->isPost() && $this->security->checkToken()) {
+
             try {
                 if ($this->request->hasFiles() != true) {
                     throw new \Exception('没有上传文件！');
@@ -155,6 +156,45 @@ class TypedataController  extends \ControllerAd{
             $this->response->redirect('typedata/dataadd');
         }
     }
+
+    public function imgaddAction(){
+        ignore_user_abort();//关掉浏览器，PHP脚本也可以继续执行.
+        set_time_limit(0);//通过set_time_limit(0)可以让程序无限制的执行下去
+
+        $typeid = $this->request->getPost('typeid');
+        $typeid = intval($typeid);
+
+        if ($this->request->isPost() && $this->security->checkToken()) {
+
+            try {
+                if ($this->request->hasFiles() != true) {
+                    throw new \Exception('没有上传文件！');
+                }
+
+                $typedata = new \Typedata();
+                $con = $typedata->getWriteConnection();
+                $imgages_dir = __DIR__.'/../../public';
+
+                foreach ($this->request->getUploadedFiles() as $file) {
+                    if (empty( $typeid)){
+                        throw new \Exception('没有选择项目！');
+                    }
+
+                    $order_id = $this->getOrderId($typeid);
+
+                    $img_src = "/images/{$typeid}_{$order_id}_1.".pathinfo($file->getName())['extension'];
+                    $file->moveTo($imgages_dir.$img_src);
+                    $con->query("INSERT INTO typedata(tid, orderid, status, data, creattime, img1) VALUES({$typeid}, {$order_id}, 1, '', ".time().", '{$img_src}')");
+                }
+            } catch (\Exception $e) {
+                $this->flashSession->error($e->getMessage());
+            }
+
+            $this->flashSession->success('文件上传成功');
+            $this->response->redirect('typedata/imgadd');
+        }
+    }
+
     public function apiAction(){
         $uid = $this->session->get('uid');
         $this->view->setVar("uid", $uid);

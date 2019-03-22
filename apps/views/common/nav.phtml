@@ -78,6 +78,13 @@ function accessAllow($uri)
                         </a>
                     </li>
                     <?php endif;?>
+                    <?php if (accessAllow('/typedata/imgadd')):?>
+                    <li class="<?php if($controller=='typedata'&& $action=='imgadd'):?>active<?php endif;?> first">
+                        <a href="<?= $this->url->get('typedata/imgadd') ?>">
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>上传图片
+                        </a>
+                    </li>
+                    <?php endif;?>
                     <?php if (accessAllow('/typedata/api')):?>
                     <li class="<?php if($controller=='typedata'&& $action=='api'):?>active<?php endif;?> first">
                         <a href="<?= $this->url->get('typedata/api') ?>">
