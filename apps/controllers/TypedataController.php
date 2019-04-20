@@ -438,8 +438,8 @@ class TypedataController  extends \ControllerAd{
         }
 
         if ($redis->hget('data_export_'.$search['typeid'], 'lock')) {
-//            $json['code'] = 500;
-//            $json['msg'] = '该项目导出，请等等导出完成';
+//            $json['code'] = 501;
+//            $json['msg'] = '该项目正在导出';
         }
 
         echo json_encode($json);
@@ -447,7 +447,8 @@ class TypedataController  extends \ControllerAd{
             $redis->lPush('data_export', json_encode($search));
             $redis->hset('data_export_'.$search['typeid'], 'percent', 1);
             $redis->hset('data_export_'.$search['typeid'], 'lock', 1);
-            $redis->expire('data_export_'.$search['typeid'], 3600);
+            $redis->hDel('data_export_'.$search['typeid'], 'maxId');
+            $redis->expire('data_export_'.$search['typeid'], 864000);
         }
         die;
     }
