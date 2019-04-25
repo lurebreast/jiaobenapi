@@ -47,6 +47,7 @@ function action_set($request)
 
     $encode = mb_detect_encoding($data, array('ASCII','UTF-8','GB2312','GBK'));
     if ($encode != 'UTF-8'){
+        file_put_contents("/tmp/charse.txt", date("Y-m-d H:i:s ").$encode.": ".$data);
         $data = iconv($encode,'UTF-8',$data);
     }
 
