@@ -126,12 +126,13 @@ for ($i = 0; $i < $limitMerge; $i++) {
 
         $maxId = $row['id'];
         $redis->hset('data_export_'.$arr['typeid'], 'maxId', $maxId);
-
-        echo floor((memory_get_peak_usage()) / 1024 / 1024) . "MB" . PHP_EOL;
     }
 
-    $redis->hset('data_export_'.$arr['typeid'], 'percent', round(($fileInc * $i) / $arr['times'], 2) * 100);
+
 }
+
+$percent = round($fileInc / $fileNum, 2) * 100;
+$redis->hset('data_export_'.$arr['typeid'], 'percent', $percent);
 
 $file = 'data_'.$arr['typeid'].'_'.$fileInc.'.xlsx';
 $dir = __DIR__ . '/../../public/files/';

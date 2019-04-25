@@ -40,6 +40,6 @@ $arr['fileInc'] = $fileInc;
 for ($i = $fileInc; $i <= $fileNum; $i++) {
     $arr['fileInc'] = $i;
 
-    exec("php /home/wwwroot/default/apps/cron/dataExportBatch.php '". json_encode($arr)."'", $output);
+    exec("php ".__DIR__."/dataExportBatch.php '". json_encode($arr)."'");
     echo "项目id:".$arr['typeid']." ".$arr['fileInc']." 总数{$fileNum}导出完成"."\n";
 }
