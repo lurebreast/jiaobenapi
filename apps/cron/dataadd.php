@@ -11,22 +11,20 @@ $arr = json_decode($json, true);
 if (!file_exists($arr['file'])) {
     $mysqli->close();
     $redis->close();
-    error_log("文件不存在：" . $arr['file']);
+    echo("文件不存在：" . $arr['file']);
     die;
 }
 
 if (!is_numeric($arr['tid'])) {
     $mysqli->close();
     $redis->close();
-    error_log("项目id不存在");
+    echo ("项目id不存在");
     die;
 }
 
 $tid = $arr['tid'];
 $file = $arr['file'];
 
-/*$file = __DIR__.'/aa.txt';
-$tid = 42;*/
 
 $fp = fopen($file, "r");
 $time = time();
@@ -35,27 +33,30 @@ $time = time();
 $arr = [];
 $i = 0;
 
+$insert = "INSERT INTO typedata(tid, orderid, status, creattime, updatetime, mobile, account, password, ip, ip_attribution, imei, device_mode, device_version, imsi, sim_id, `name`, id_card) values ";
+
 while (!feof($fp)) {
     $i++;
-    $data = trim(fgets($fp));
+    $data = fgets($fp, 2048);
     if (!$data) {
         continue;
     }
 
-    $encode = mb_detect_encoding($data, array('ASCII', 'UTF-8', 'GB2312', 'GBK'));
-    if ($encode != 'UTF-8') {
-        $data = iconv($encode, 'UTF-8', $data);
+    $fields = explode(',', $data);
+    if (!$fields) {
+        continue;
     }
 
-    $arr[] = "($tid, ".getOrderId($redis, $mysqli, $tid).", 1, '".$mysqli->escape_string($data)."', $time)";
+
+    $fields = array_map(function($v) use ($mysqli) {
+        return $mysqli->escape_string(trim($v));
+    }, $fields);
+
+    $arr[] = "($tid, ".getOrderId($redis, $mysqli, $tid).", 1, $time, $time, '".implode("','", $fields)."')";
     if ($i % 1000 == 0) {
-
-        $values = implode(', ', $arr);
-        $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
-
-        echo $sql;
+        $sql =  $insert.implode(', ', $arr);
         if (!$mysqli->query($sql)) {
-            error_log($mysqli->errno.' ' .$mysqli->error);
+            echo $mysqli->errno.' ' .$mysqli->error;
         }
         echo (memory_get_usage() / 1024).'kb'."\n";
         $arr = [];
@@ -63,11 +64,9 @@ while (!feof($fp)) {
 }
 
 if ($arr) {
-    $values = implode(', ', $arr);
-    $sql = "INSERT INTO typedata(tid, orderid, status, data, creattime) VALUES $values";
-
+    $sql =  $insert.implode(', ', $arr);
     if (!$mysqli->query($sql)) {
-        error_log($mysqli->errno.' ' .$mysqli->error);
+        echo $mysqli->errno.' ' .$mysqli->error;
     }
     echo (memory_get_usage() / 1024).'kb'."\n";
 }

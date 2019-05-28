@@ -28,13 +28,15 @@ if (mysqli_connect_errno()) {
 }
 
 $json = $redis->lPop('data_export');
-//$json = '{"_url":"\/typedata\/outdata","typeid":"3448","status":"0","sttime":"","endtime":"","image_file":"0"}';
+//$json = '{"_url":"\/typedata\/outdata","typeid":"1","status":"0","sttime":"","endtime":"","image_file":"0"}';
 if ($json) {
     require __DIR__.'/dataExport.php';
     die;
 }
 
 $json = $redis->lPop('dataadd_files');
+
+//$json = '{"tid":3,"file":"\/home\/wwwroot\/default\/public\/..\/apps\/cron\/import_data_3.txt"}';
 if ($json) {
     require __DIR__.'/dataadd.php';
     die;

@@ -42,6 +42,18 @@ $objActSheet->setCellValue('F1', '上传时间');
 $objActSheet->setCellValue('G1', '数据');
 $objActSheet->setCellValue('H1', '图片');
 $objActSheet->setCellValue('I1', '图片1');
+$objActSheet->setCellValue('J1', '手机号');
+$objActSheet->setCellValue('K1', '账号');
+$objActSheet->setCellValue('L1', '密码');
+$objActSheet->setCellValue('M1', 'IP');
+$objActSheet->setCellValue('N1', 'IP地址');
+$objActSheet->setCellValue('O1', 'IMEI');
+$objActSheet->setCellValue('P1', '设备型号');
+$objActSheet->setCellValue('Q1', '设备系统版本');
+$objActSheet->setCellValue('R1', 'IMSI');
+$objActSheet->setCellValue('S1', 'SIM卡ID');
+$objActSheet->setCellValue('T1', '姓名');
+$objActSheet->setCellValue('U1', '身份证');
 // 设置个表格宽度
 $objActSheet->getColumnDimension('E')->setWidth(19);
 $objActSheet->getColumnDimension('F')->setWidth(19);
@@ -117,6 +129,20 @@ for ($i = 0; $i < $limitMerge; $i++) {
             $objActSheet->setCellValue('I' . $k, ($row['img1'] ? 'http://47.99.122.175' . $row['img1'] : ''));
         }
 
+        $objActSheet->getColumnDimension("J")->setAutoSize(true);
+        $objActSheet->setCellValueExplicit('J' . $k, $row['mobile'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('K' . $k, $row['account']);
+        $objActSheet->setCellValue('L' . $k, $row['password']);
+        $objActSheet->setCellValueExplicit('M' . $k, $row['ip'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('N' . $k, $row['ip_attribution']);
+        $objActSheet->setCellValueExplicit('O' . $k, $row['imei'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('P' . $k, $row['device_mode']);
+        $objActSheet->setCellValue('Q' . $k, $row['device_version']);
+        $objActSheet->setCellValueExplicit('R' . $k, $row['imsi'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValueExplicit('S' . $k, $row['sim_id'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('T' . $k, $row['name']);
+        $objActSheet->setCellValueExplicit('U' . $k, $row['id_card'], PHPExcel_Cell_DataType::TYPE_STRING);
+
         // 表格高度
         if ($arr['image_file']) {
             $objActSheet->getRowDimension($k)->setRowHeight(50);
@@ -128,12 +154,10 @@ for ($i = 0; $i < $limitMerge; $i++) {
         $redis->hset('data_export_'.$arr['typeid'], 'maxId', $maxId);
     }
 
-
 }
 
 $percent = round($fileInc / $fileNum, 2) * 100;
 $redis->hset('data_export_'.$arr['typeid'], 'percent', $percent);
-
 $file = 'data_'.$arr['typeid'].'_'.$fileInc.'.xlsx';
 $dir = __DIR__ . '/../../public/files/';
 

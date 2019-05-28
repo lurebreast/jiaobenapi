@@ -103,18 +103,29 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
     <thead>
     <tr>
         <?php if ($superAdmin):?>
-            <td width="64"><input type="checkbox" onclick="selectAll(this)"/>全选</td>
+            <th width="64"><input type="checkbox" onclick="selectAll(this)"/>全选</th>
         <?php endif;?>
-        <th width="64">id</th>
         <th width="64">序号</th>
-        <th width="64" >提取</th>
+        <th width="64">提取</th>
         <th width="64">项目id</th>
-        <th width="74">项目名称</th>
-        <th width="150">图片</th>
-        <th width="150">图片1</th>
-        <th width="84">上传时间</th>
-        <th width="84">更新时间</th>
-        <th>数据</th>
+        <th width="80">项目名称</th>
+        <th width="64">图片</th>
+        <th width="64">图片1</th>
+        <th width="100">手机号</th>
+        <th width="80">账号</th>
+        <th width="64">密码</th>
+        <th width="64">IP</th>
+        <th width="80">IP地址</th>
+        <th width="125">IMEI</th>
+        <th width="140">设备型号</th>
+        <th width="64">设备系统版本</th>
+        <th width="150">IMSI</th>
+        <th width="160">SIMID</th>
+        <th width="64">姓名</th>
+        <th width="150">身份证</th>
+        <th width="82">上传时间</th>
+        <th width="82">更新时间</th>
+        <th width="64">数据</th>
         <?php if ($superAdmin):?>
             <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>
         <?php endif;?>
@@ -126,13 +137,24 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
             <?php if ($superAdmin):?>
                 <td><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
             <?php endif;?>
-            <td><?= $item->id;?></td>
             <td><?= $item->orderid;?></td>
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <td><?= $item->tid;?></td>
             <td><?= $typearrs[$item->tid];?></td>
-            <td><? if ($item->img){echo '<img src="'.$item->img.'" width="136"/>';}?></td>
-            <td><? if ($item->img1){echo '<img src="'.$item->img1.'" width="136"/>';}?></td>
+            <td><? if ($item->img){echo '<img src="'.$item->img.'" width="50" height="50"/>';}?></td>
+            <td><? if ($item->img1){echo '<img src="'.$item->img1.'" width="50" height="50"/>';}?></td>
+            <td><?= $item->mobile;?></td>
+            <td><?= $item->account;?></td>
+            <td><?= $item->password;?></td>
+            <td><?= $item->ip;?></td>
+            <td><?= $item->ip_attribution;?></td>
+            <td><?= $item->imei;?></td>
+            <td><?= $item->device_mode;?></td>
+            <td><?= $item->device_version;?></td>
+            <td><?= $item->imsi;?></td>
+            <td><?= $item->sim_id;?></td>
+            <td><?= $item->name;?></td>
+            <td><?= $item->id_card;?></td>
             <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
             <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
             <td><?= $item->data;?></td>
