@@ -1,59 +1,146 @@
 <div class="pd2 cf">
     <h4 class="fl">接口说明</h4>
-
 </div>
-<iframe src="<?=$domain_url?>:8080/swagger" height="800px" width="100%"></iframe>
 <div class="col-sm-12">
-    <h1>接口地址：<?=$domain_url?>/api</h1>
+    <h2>1 获取数据</h2>
+    <h2>1.1 请求方式</h2>
+    <p>请求URL：<?=$domain_url?>/v1/data/post</p>
+    <p>请求访求：POST</p>
+    <h3>1.2 请求参数</h3>
+    <table>
+        <thead><tr><th style="text-align:left">名称</th><th>描述</th></tr></thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left"><code>Tid</code></td>
+                <td>项目id</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Orderid</code></td>
+                <td>序号 当有值时更新数据</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Img</code></td>
+                <td>图片base64编码</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Img1</code></td>
+                <td>图片1base64编码</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Mobile</code></td>
+                <td>手机号</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Account</code></td>
+                <td>用户名</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Password</code></td>
+                <td>密码</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Ip</code></td>
+                <td>ip</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>IpAttribution</code></td>
+                <td>ip归属地</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>DeviceMode</code></td>
+                <td>设备型号</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>DeviceVersion</code></td>
+                <td>设备系统版本</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Imsi</code></td>
+                <td>imsi</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>SimId</code></td>
+                <td>SimId</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Name</code></td>
+                <td>姓名</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>IdCard</code></td>
+                <td>身份证号码</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr />
+    <h2>2 获取数据</h2>
+    <h2>2.1 请求方式</h2>
+    <p>请求URL：<?=$domain_url?>/v1/data/getone</p>
+    <p>请求访求：GET</p>
+    <h3>2.2 请求参数</h3>
+    <table>
+        <thead><tr><th style="text-align:left">名称</th><th>描述</th></tr></thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left"><code>Tid</code></td>
+                <td>项目id</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Orderid</code></td>
+                <td>序号</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Rand</code></td>
+                <td>是否随机 1 是</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Update</code></td>
+                <td>是否更新为已提取 1 更新</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr />
+    <h2>3 获取项目总数</h2>
+    <h2>3.1 请求方式</h2>
+    <p>请求URL：<?=$domain_url?>/v1/data/count</p>
+    <p>请求访求：GET</p>
+    <h3>3.2 请求参数</h3>
+    <table>
+        <thead><tr><th style="text-align:left">名称</th><th>描述</th></tr></thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left"><code>Tid</code></td>
+                <td>项目id</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Day</code></td>
+                <td>获取多少天前零点到现在的数据</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Status</code></td>
+                <td>是否只获取已提取 1 是</td>
+            </tr>
+        </tbody>
+    </table>
 
-    <hr>
-    <h2>一、上传接口</h2>
-    <p>1、调用示例：<?=$domain_url?>/api/set?only=0&typeid=9&typedataid=4&data=0000001</p>
-    <p>2、参数说明：</p>
-    <p>2.2、only：是否过滤重复数据；非必传；参数值0或1；默认值0；如果传1上传耗时稍长,</p>
-    <p>2.3、typeid：项目ID；必传</p>
-    <p>2.4、typedataid：数据ID；选传</p>
-    <p>2.8、data：上传数据；必传</p>
-    <p>2.8、img：上传图片；选传</p>
-    <p>2.8、img1：上传图片1；选传</p>
-    <p>3、返回值说明：</p>
-    <p>3.1、成功返回：OK|项目ID|数据ID</p>
-    <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
-
-    <hr>
-    <h2>二、提取接口</h2>
-    <p>1、调用示例：<?=$domain_url?>/api/get?typeid=9&rand=1</p>
-    <p>2、参数说明：</p>
-    <p>2.1、typeid：项目ID；必传；用户端查看</p>
-    <p>2.4、typedataid：数据ID；选传</p>
-    <p>2.2、rand：
-        <br/>rand:0, typedataid 提取单条数据：<?=$domain_url?>/api/get?rand=0&typeid=26&typedataid=25814
-        <br/>rand:0 随机提取一条数据：<?=$domain_url?>/api/get?rand=0&typeid=26
-        <br/>rand:1 获取随机一条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?rand=1&typeid=26
-        <br/>rand:不传, typedataid:不传 获取最新一条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?typeid=26
-        <br/>rand:不传, typedataid:83 获取单条未提取数据且更新状态为已提取：<?=$domain_url?>/api/get?typeid=26&typedataid=83
-    </p>
-    <p>3.1、成功返回：OK|ID|数据|项目ID|数据ID|创建时间</p>
-    <p>3.2、失败返回：ERR|失败原因</p>
-
-    <hr>
-    <h2>三、获取数量接口</h2>
-    <p>1、调用示例：<?=$domain_url?>/api/getcount?typeid=9&status=1</p>
-    <p>2、参数说明：</p>
-    <p>2.2、status：是否已提取；非必传；参数值1或2；1:未提取,2,已提取</p>
-    <p>2.3、typeid：项目ID；必传</p>
-    <p>3、返回值说明：</p>
-    <p>3.1、成功返回：OK|数量</p>
-    <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
-
-    <hr>
-    <h2>四、删除接口</h2>
-    <p>1、调用示例：<?=$domain_url?>/api/del?typeid=24&typedataid=1</p>
-    <p>2、参数说明：</p>
-    <p>2.3、typeid：项目ID；必传</p>
-    <p>2.4、typedataid：数据ID；必传</p>
-    <p>3、返回值说明：</p>
-    <p>3.1、成功返回：OK|</p>
-    <p>3.2、失败返回：ERR|失败原因  注意：如果返回空请重新提交</p>
-
+    <hr />
+    <h2>返回说明</h2>
+    <p>返回格式：JSON</p>
+    <table>
+        <thead><tr><th style="text-align:left">名称</th><th>描述</th></tr></thead>
+        <tbody>
+            <tr>
+                <td style="text-align:left"><code>Code</code></td>
+                <td>状态码 200 返回成功</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Msg</code></td>
+                <td>错误信息</td>
+            </tr>
+            <tr>
+                <td style="text-align:left"><code>Data</code></td>
+                <td>具体数据</td>
+            </tr>
+        </tbody>
+    </table>
 </div>

@@ -1,5 +1,12 @@
-create table app_files(
-    id int(10) unsigned not null primary key auto_increment comment '自增主键',
-    file_path varchar(32) not null default '' comment 'web文件路径',
-    remark varchar(32) default '' comment '包备注'
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+alter table typedata add column mobile char(15) not null default '' comment '手机号', 
+    add column account varchar(32) not null default '' comment '账号',
+    add column password varchar(32) not null default '' comment '密码',
+    add column ip char(15) not null default '' comment 'ip',
+    add column ip_attribution varchar(15) not null default '' comment 'ip归属地',
+    add column imei varchar(32) not null default '' comment 'IMEI',
+    add column device_mode varchar(32) not null default '' comment '设备型号',
+    add column device_version varchar(32) not null default '' comment '设备系统版本',
+    add column imsi varchar(32) not null default '' comment 'IMSI',
+    add column sim_id varchar(32) not null default '' comment 'SIM Id',
+    add column name varchar(32) not null default '' comment '名字',
+    add column id_card varchar(32) not null default '' comment '身份证号码';
