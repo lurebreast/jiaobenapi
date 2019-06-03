@@ -141,8 +141,8 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <td><?= $item->tid;?></td>
             <td><?= $typearrs[$item->tid];?></td>
-            <td><? if ($item->img){echo '<img src="'.$item->img.'" width="50" height="50"/>';}?></td>
-            <td><? if ($item->img1){echo '<img src="'.$item->img1.'" width="50" height="50"/>';}?></td>
+            <td><? if ($item->img){echo '<img  class="img_show" src="'.$item->img.'" width="50" height="50"/>';}?></td>
+            <td><? if ($item->img1){echo '<img  class="img_show" src="'.$item->img1.'" width="50" height="50"/>';}?></td>
             <td><?= $item->mobile;?></td>
             <td><?= $item->account;?></td>
             <td><?= $item->password;?></td>
@@ -200,3 +200,17 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
         </div>
     </div>
 </div>
+
+<!--  图片预览 -->
+<style>
+    .img_show {
+        cursor: pointer;
+    }
+</style>
+<script>
+    $(function() {
+        $(".img_show").on("click", function() {
+            window.open(this.src, "_blank");
+        })
+    })
+</script>
