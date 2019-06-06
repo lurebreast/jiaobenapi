@@ -35,22 +35,14 @@ class TypedataController  extends \ControllerAd{
         if (!empty($search['endtime'])){
             $where .= " and creattime < ".strtotime($search['endtime']);
         }
-        if (!empty($search['data'])){
-            $where .= " and data like '%".$search['data']."%'";
-        }
         if (!$this->typeAll) {
             $inTid = implode(',', array_keys($typearrs));
             $where .= " and tid in($inTid)";
         }
 
         $table = $target == 'recycle' ? 'typedata_recycle' : 'typedata';
-        if (!empty($search['data_unique'])){
-            $sql = "SELECT * FROM $table $where GROUP BY data order by id desc LIMIT :limit OFFSET :offset";
-            $totalSql = "SELECT COUNT(DISTINCT(data)) rowcount FROM $table $where";
-        } else {
-            $sql = "SELECT * FROM $table $where order by id desc LIMIT :limit OFFSET :offset";
-            $totalSql = "SELECT COUNT(*) rowcount FROM $table $where";
-        }
+        $sql = "SELECT * FROM $table $where order by id desc LIMIT :limit OFFSET :offset";
+        $totalSql = "SELECT COUNT(*) rowcount FROM $table $where";
 
         $paginator = new PaginatorSql(
             array(

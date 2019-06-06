@@ -34,62 +34,55 @@ if (!\PHPExcel_Settings::setCacheStorageMethod($cacheMethod)) {
 }
 
 $objActSheet->setCellValue('A1', '序号');
-$objActSheet->setCellValue('B1', '提取');
-$objActSheet->setCellValue('C1', '项目id');
-$objActSheet->setCellValue('D1', '项目名称');
+$objActSheet->setCellValue('B1', '项目id');
+$objActSheet->setCellValue('C1', '项目名称');
+$objActSheet->setCellValue('D1', '上传时间');
 $objActSheet->setCellValue('E1', '更新时间');
-$objActSheet->setCellValue('F1', '上传时间');
-$objActSheet->setCellValue('G1', '数据');
-$objActSheet->setCellValue('H1', '图片');
-$objActSheet->setCellValue('I1', '图片1');
-$objActSheet->setCellValue('J1', '手机号');
-$objActSheet->setCellValue('K1', '账号');
-$objActSheet->setCellValue('L1', '密码');
-$objActSheet->setCellValue('M1', 'IP');
-$objActSheet->setCellValue('N1', 'IP地址');
-$objActSheet->setCellValue('O1', 'IMEI');
+$objActSheet->setCellValue('F1', '图片');
+$objActSheet->setCellValue('G1', '图片1');
+$objActSheet->setCellValue('H1', '手机号');
+$objActSheet->setCellValue('I1', '账号');
+$objActSheet->setCellValue('J1', '密码');
+$objActSheet->setCellValue('K1', 'IP');
+$objActSheet->setCellValue('L1', 'IP地址');
+$objActSheet->setCellValue('M1', 'IMEI');
+$objActSheet->setCellValue('N1', '姓名');
+$objActSheet->setCellValue('O1', '身份证');
 $objActSheet->setCellValue('P1', '设备型号');
 $objActSheet->setCellValue('Q1', '设备系统版本');
 $objActSheet->setCellValue('R1', 'IMSI');
 $objActSheet->setCellValue('S1', 'SIM卡ID');
-$objActSheet->setCellValue('T1', '姓名');
-$objActSheet->setCellValue('U1', '身份证');
+$objActSheet->setCellValue('T1', '提取');
+
 // 设置个表格宽度
+$objActSheet->getColumnDimension('D')->setWidth(19);
 $objActSheet->getColumnDimension('E')->setWidth(19);
-$objActSheet->getColumnDimension('F')->setWidth(19);
-$objActSheet->getColumnDimension('G')->setWidth(50);
 
 if ($arr['image_file']) {
-    $objActSheet->getColumnDimension('H')->setWidth(6);
-    $objActSheet->getColumnDimension('I')->setWidth(6);
+    $objActSheet->getColumnDimension('F')->setWidth(6);
+    $objActSheet->getColumnDimension('G')->setWidth(6);
 } else {
-    $objActSheet->getColumnDimension('H')->setWidth(44);
-    $objActSheet->getColumnDimension('I')->setWidth(44);
+    $objActSheet->getColumnDimension('F')->setWidth(44);
+    $objActSheet->getColumnDimension('G')->setWidth(44);
 }
 
-$objActSheet->getStyle('H')->getAlignment()->setWrapText(true);
+$objActSheet->getStyle('F')->getAlignment()->setWrapText(true);
 $objActSheet->getStyle('G')->getAlignment()->setWrapText(true);
-$objActSheet->getStyle('I')->getAlignment()->setWrapText(true);
+$objActSheet->getColumnDimension("H")->setAutoSize(true);
 
 $k = 2;
 for ($i = 0; $i < $limitMerge; $i++) {
-    $sql = "select * from typedata where id<" . $maxId . " and $where";
-    if (!empty($arr['data_unique'])) {
-        $sql .= " group by data";
-    }
-    $sql .= " order by id desc limit $limit";
+    $sql = "select * from typedata where id<" . $maxId . " and $where order by id desc limit $limit";
 
     echo $sql . "\n";
     $res = $mysqli->query($sql);
     while ($row = $res->fetch_assoc()) {
 
         $objActSheet->setCellValue('A' . $k, $row['orderid']);
-        $objActSheet->setCellValue('B' . $k, $row['status'] == 1 ? '未提取' : '已提取');
-        $objActSheet->setCellValue('C' . $k, $row['tid']);
-        $objActSheet->setCellValue('D' . $k, $typename);
-        $objActSheet->setCellValue('E' . $k, date('Y-m-d H:i:s', $row['creattime']));
-        $objActSheet->setCellValue('F' . $k, $row['updatetime'] ? date('Y-m-d H:i:s', $row['updatetime']) : '');
-        $objActSheet->setCellValue('G' . $k, $row['data']);
+        $objActSheet->setCellValue('B' . $k, $row['tid']);
+        $objActSheet->setCellValue('C' . $k, $typename);
+        $objActSheet->setCellValue('D' . $k, date('Y-m-d H:i:s', $row['creattime']));
+        $objActSheet->setCellValue('E' . $k, $row['updatetime'] ? date('Y-m-d H:i:s', $row['updatetime']) : '');
 
         if ($arr['image_file']) {
             // 图片生成
@@ -101,13 +94,13 @@ for ($i = 0; $i < $limitMerge; $i++) {
                 $objDrawing[$k]->setWidth(30); //照片宽度
                 $objDrawing[$k]->setResizeProportional(true);
                 /*设置图片要插入的单元格*/
-                $objDrawing[$k]->setCoordinates('H' . $k);
+                $objDrawing[$k]->setCoordinates('F' . $k);
                 // 图片偏移距离
                 $objDrawing[$k]->setOffsetX(6);
                 $objDrawing[$k]->setOffsetY(6);
                 $objDrawing[$k]->setWorksheet($objPHPExcel->getActiveSheet());
             } else {
-                $objActSheet->setCellValue('H' . $k, '');
+                $objActSheet->setCellValue('F' . $k, '');
             }
             if ($row['img1'] && file_exists($image_dir . $row['img1'])) {
                 $objDrawing[$k] = new \PHPExcel_Worksheet_Drawing();
@@ -116,32 +109,32 @@ for ($i = 0; $i < $limitMerge; $i++) {
                 $objDrawing[$k]->setWidth(30); //照片宽度
                 $objDrawing[$k]->setResizeProportional(true);
                 /*设置图片要插入的单元格*/
-                $objDrawing[$k]->setCoordinates('I' . $k);
+                $objDrawing[$k]->setCoordinates('G' . $k);
                 // 图片偏移距离
                 $objDrawing[$k]->setOffsetX(6);
                 $objDrawing[$k]->setOffsetY(6);
                 $objDrawing[$k]->setWorksheet($objPHPExcel->getActiveSheet());
             } else {
-                $objActSheet->setCellValue('I' . $k, '');
+                $objActSheet->setCellValue('G' . $k, '');
             }
         } else {
-            $objActSheet->setCellValue('H' . $k, ($row['img'] ? 'http://47.99.122.175' . $row['img'] : ''));
-            $objActSheet->setCellValue('I' . $k, ($row['img1'] ? 'http://47.99.122.175' . $row['img1'] : ''));
+            $objActSheet->setCellValue('F' . $k, ($row['img'] ? 'http://47.99.122.175' . $row['img'] : ''));
+            $objActSheet->setCellValue('G' . $k, ($row['img1'] ? 'http://47.99.122.175' . $row['img1'] : ''));
         }
 
-        $objActSheet->getColumnDimension("J")->setAutoSize(true);
-        $objActSheet->setCellValueExplicit('J' . $k, $row['mobile'], PHPExcel_Cell_DataType::TYPE_STRING);
-        $objActSheet->setCellValue('K' . $k, $row['account']);
-        $objActSheet->setCellValue('L' . $k, $row['password']);
-        $objActSheet->setCellValueExplicit('M' . $k, $row['ip'], PHPExcel_Cell_DataType::TYPE_STRING);
-        $objActSheet->setCellValue('N' . $k, $row['ip_attribution']);
-        $objActSheet->setCellValueExplicit('O' . $k, $row['imei'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValueExplicit('H' . $k, $row['mobile'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('I' . $k, $row['account']);
+        $objActSheet->setCellValue('J' . $k, $row['password']);
+        $objActSheet->setCellValueExplicit('K' . $k, $row['ip'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('L' . $k, $row['ip_attribution']);
+        $objActSheet->setCellValueExplicit('M' . $k, $row['imei'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('N' . $k, $row['name']);
+        $objActSheet->setCellValueExplicit('O' . $k, $row['id_card'], PHPExcel_Cell_DataType::TYPE_STRING);
         $objActSheet->setCellValue('P' . $k, $row['device_mode']);
         $objActSheet->setCellValue('Q' . $k, $row['device_version']);
         $objActSheet->setCellValueExplicit('R' . $k, $row['imsi'], PHPExcel_Cell_DataType::TYPE_STRING);
         $objActSheet->setCellValueExplicit('S' . $k, $row['sim_id'], PHPExcel_Cell_DataType::TYPE_STRING);
-        $objActSheet->setCellValue('T' . $k, $row['name']);
-        $objActSheet->setCellValueExplicit('U' . $k, $row['id_card'], PHPExcel_Cell_DataType::TYPE_STRING);
+        $objActSheet->setCellValue('T' . $k, $row['status'] == 1 ? '未提取' : '已提取');
 
         // 表格高度
         if ($arr['image_file']) {
@@ -153,7 +146,6 @@ for ($i = 0; $i < $limitMerge; $i++) {
         $maxId = $row['id'];
         $redis->hset('data_export_'.$arr['typeid'], 'maxId', $maxId);
     }
-
 }
 
 $percent = round($fileInc / $fileNum, 2) * 100;

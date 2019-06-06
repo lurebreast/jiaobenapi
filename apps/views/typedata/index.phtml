@@ -93,8 +93,6 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
         </select>
         上传时间<input id="sttime"  class="form-control" name="sttime"  placeholder="开始日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['sttime']?>" style="width: 142px;">
         -<input id="endtime" class="form-control" name="endtime"  placeholder="结束日期" data-options="required:true,disabled:false" onclick="new WdatePicker({dateFmt:'yyyy-MM-dd HH:00:00'});" value="<?= $search['endtime'];?>" style="width: 142px;">
-        数据去重<input id="data_unique" name='data_unique' type="checkbox" <? if (!empty($search['data_unique'])) echo 'checked'?> value="1"/>
-        &nbsp;数据<input name='data' type="text" value="<?=@$search['data']?>"/>
         <input type="hidden" name="target" value="<?=$search['target'] ?>">
         <button type="submit" class="btn btn-flat btn-success">搜索</button>
     </div>
@@ -106,26 +104,25 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
             <th width="64"><input type="checkbox" onclick="selectAll(this)"/>全选</th>
         <?php endif;?>
         <th width="64">序号</th>
-        <th width="64">提取</th>
         <th width="64">项目id</th>
         <th width="80">项目名称</th>
+        <th width="82">上传时间</th>
+        <th width="82">更新时间</th>
         <th width="64">图片</th>
         <th width="64">图片1</th>
         <th width="100">手机号</th>
         <th width="80">账号</th>
         <th width="64">密码</th>
-        <th width="64">IP</th>
+        <th width="112">IP</th>
         <th width="80">IP地址</th>
         <th width="125">IMEI</th>
+        <th width="64">姓名</th>
+        <th width="150">身份证</th>
         <th width="140">设备型号</th>
         <th width="64">设备系统版本</th>
         <th width="150">IMSI</th>
         <th width="160">SIMID</th>
-        <th width="64">姓名</th>
-        <th width="150">身份证</th>
-        <th width="82">上传时间</th>
-        <th width="82">更新时间</th>
-        <th width="64">数据</th>
+        <th width="64">提取</th>
         <?php if ($superAdmin):?>
             <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>
         <?php endif;?>
@@ -138,9 +135,10 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
                 <td><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
             <?php endif;?>
             <td><?= $item->orderid;?></td>
-            <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <td><?= $item->tid;?></td>
             <td><?= $typearrs[$item->tid];?></td>
+            <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
+            <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
             <td><? if ($item->img){echo '<img  class="img_show" src="'.$item->img.'" width="50" height="50"/>';}?></td>
             <td><? if ($item->img1){echo '<img  class="img_show" src="'.$item->img1.'" width="50" height="50"/>';}?></td>
             <td><?= $item->mobile;?></td>
@@ -149,15 +147,13 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
             <td><?= $item->ip;?></td>
             <td><?= $item->ip_attribution;?></td>
             <td><?= $item->imei;?></td>
+            <td><?= $item->name;?></td>
+            <td><?= $item->id_card;?></td>
             <td><?= $item->device_mode;?></td>
             <td><?= $item->device_version;?></td>
             <td><?= $item->imsi;?></td>
             <td><?= $item->sim_id;?></td>
-            <td><?= $item->name;?></td>
-            <td><?= $item->id_card;?></td>
-            <td><?= date('Y-m-d H:i:s',$item->creattime);?></td>
-            <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
-            <td><?= $item->data;?></td>
+            <td><?= $item->status=='1'?'未提取':'已提取';?></td>
             <?php if ($superAdmin):?>
                 <td><a href="<?= $this->url->get('typedata/moveTypedata?ids='.$item->id.'&type=del') ?>" class="btn btn-sm btn-danger delete">删除</a></td>
             <?php endif;?>

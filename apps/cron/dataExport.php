@@ -8,16 +8,12 @@ $arr['sttime'] && $where .= " and creattime>=".strtotime($arr['sttime']);
 $arr['endtime'] && $where .= " and creattime<".strtotime($arr['endtime']);
 
 // 总数
-if (!empty($arr['data_unique'])) {
-    $sql = "select count(DISTINCT(data)) as total from typedata where $where";
-} else {
-    $sql = "select count(*) as total from typedata where $where";
-}
+$sql = "select count(*) as total from typedata where $where";
 $res = $mysqli->query($sql);
 $total = $res->fetch_assoc()['total'];
 
 // 最大id
-$sql = "select id from typedata where $where".(!empty($arr['data_unique']) ? " group by data" : '')." order by id desc limit 1";
+$sql = "select id from typedata where $where order by id desc limit 1";
 $res = $mysqli->query($sql);
 $maxId = (int)$res->fetch_assoc()['id'] + 1; // 包含当前行
 
