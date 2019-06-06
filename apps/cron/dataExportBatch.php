@@ -32,6 +32,7 @@ $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_discISAM;
 if (!\PHPExcel_Settings::setCacheStorageMethod($cacheMethod)) {
     die($cacheMethod . " 缓存方法不可用" . EOL);
 }
+$objActSheet->getDefaultStyle()->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_RIGHT); // 水平距右
 
 $objActSheet->setCellValue('A1', '序号');
 $objActSheet->setCellValue('B1', '项目id');
@@ -69,6 +70,16 @@ if ($arr['image_file']) {
 $objActSheet->getStyle('F')->getAlignment()->setWrapText(true);
 $objActSheet->getStyle('G')->getAlignment()->setWrapText(true);
 $objActSheet->getColumnDimension("H")->setAutoSize(true);
+$objActSheet->getColumnDimension("I")->setAutoSize(true);
+$objActSheet->getColumnDimension("J")->setAutoSize(true);
+$objActSheet->getColumnDimension("K")->setAutoSize(true);
+$objActSheet->getColumnDimension("L")->setAutoSize(true);
+$objActSheet->getColumnDimension("M")->setAutoSize(true);
+$objActSheet->getColumnDimension("O")->setAutoSize(true);
+$objActSheet->getColumnDimension("P")->setAutoSize(true);
+$objActSheet->getColumnDimension("Q")->setAutoSize(true);
+$objActSheet->getColumnDimension("R")->setAutoSize(true);
+$objActSheet->getColumnDimension("S")->setAutoSize(true);
 
 $k = 2;
 for ($i = 0; $i < $limitMerge; $i++) {
