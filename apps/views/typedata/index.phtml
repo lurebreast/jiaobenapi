@@ -110,6 +110,7 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
         <th width="82">更新时间</th>
         <th width="64">图片</th>
         <th width="64">图片1</th>
+        <th width="64">文件</th>
         <th width="100">手机号</th>
         <th width="80">账号</th>
         <th width="64">密码</th>
@@ -141,6 +142,7 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
             <td><?if ($item->updatetime){echo date('Y-m-d H:i:s',$item->updatetime);}?></td>
             <td><? if ($item->img){echo '<img  class="img_show" src="'.$item->img.'" width="50" height="50"/>';}?></td>
             <td><? if ($item->img1){echo '<img  class="img_show" src="'.$item->img1.'" width="50" height="50"/>';}?></td>
+            <td><? if ($item->file){echo '<a href="'.$item->file.'" target="_blank">下载</a>';}?></td>
             <td><?= $item->mobile;?></td>
             <td><?= $item->account;?></td>
             <td><?= $item->password;?></td>

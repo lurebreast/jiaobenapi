@@ -35,18 +35,34 @@ $i = 0;
 
 $insert = "INSERT INTO typedata(tid, orderid, status, creattime, updatetime, mobile, account, password, ip, ip_attribution, imei, device_mode, device_version, imsi, sim_id, `name`, id_card) values ";
 
+$pos = fgetcsv($fp);
+$pos = array_map(function($v) {
+    return trim($v, "\xEF\xBB\xBF"); // 去除bom头
+}, $pos);
+$pos = array_unique($pos);
+$pos = array_flip($pos);
+
 while (!feof($fp)) {
     $i++;
-    $data = fgets($fp, 2048);
-    if (!$data) {
+    $data = fgetcsv($fp);
+    if ($data == false) {
         continue;
     }
 
-    $fields = explode(',', $data);
-    if (!$fields) {
-        continue;
-    }
-
+    $fields = [
+        $data[$pos['手机号']],
+        $data[$pos['账号']],
+        $data[$pos['密码']],
+        $data[$pos['IP']],
+        $data[$pos['IP地址']],
+        $data[$pos['IMEI']],
+        $data[$pos['设备型号']],
+        $data[$pos['设备系统版本']],
+        $data[$pos['IMSI']],
+        $data[$pos['SimId']],
+        $data[$pos['姓名']],
+        $data[$pos['身份证']],
+    ];
 
     $fields = array_map(function($v) use ($mysqli) {
         return $mysqli->escape_string(trim($v));

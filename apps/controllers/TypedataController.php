@@ -127,11 +127,11 @@ class TypedataController  extends \ControllerAd{
                         throw new \Exception('没有选择项目！');
                     }
 
-                    if (strpos($file->getName(), '.txt') === false) {
-                        throw new \Exception($file->getName()."上传文件不是txt文件");
+                    if (strpos($file->getName(), '.csv') === false) {
+                        throw new \Exception($file->getName()."上传文件不是csv文件");
                     }
 
-                    $file_name = $_SERVER['DOCUMENT_ROOT'].'/../apps/cron/import_data_'.$typeid.'.txt';
+                    $file_name = $_SERVER['DOCUMENT_ROOT'].'/../apps/cron/import_data_'.$typeid.'.csv';
                     if (file_exists($file_name)) {
                         throw new \Exception($file->getName()."文件已经上传，请务重复");
                     }

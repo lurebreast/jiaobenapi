@@ -36,7 +36,7 @@ if ($json) {
 
 $json = $redis->lPop('dataadd_files');
 
-//$json = '{"tid":3,"file":"\/home\/wwwroot\/default\/public\/..\/apps\/cron\/import_data_3.txt"}';
+//$json = '{"tid":1,"file":"\/home\/wwwroot\/default\/public\/..\/apps\/cron\/import_data_1.csv"}';
 if ($json) {
     require __DIR__.'/dataadd.php';
     die;
