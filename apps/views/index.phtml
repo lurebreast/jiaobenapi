@@ -7,11 +7,10 @@
     <meta itemprop="name" content="<?= Phalcon\Tag::getTitle(FALSE) ?>"/>
     <meta itemprop="image" content="<?= @$logo; ?>" />
     <meta name="description" itemprop="description" content="<?= @$description?>" />
+    <meta property="og:title" content="xiaozhang" />
+    <meta property="og:image" content="<?=$domain_url?>/images/8131_22_0.png" />
     <?php $this->assets->outputCss() ?>
     <?php $this->assets->outputJs() ?>
-    <?php if(stripos(\Phalcon\Arr::get($_SERVER, 'HTTP_HOST'), 'admin') === FALSE):?>
-
-    <?php endif;?>
 </head>
 <body class="<?= isset($bodystyle) ? $bodystyle : '' ?>">
 <?= $this->getContent() ?>
