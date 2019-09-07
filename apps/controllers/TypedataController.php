@@ -176,7 +176,7 @@ class TypedataController  extends \ControllerAd{
 
                     $img_src = "/images/{$typeid}_{$order_id}_1.".pathinfo($file->getName())['extension'];
                     $file->moveTo($imgages_dir.$img_src);
-                    $con->query("INSERT INTO typedata(tid, orderid, status, data, creattime, img1) VALUES({$typeid}, {$order_id}, 1, '', ".time().", '{$img_src}')");
+                    $con->query("INSERT INTO typedata(tid, orderid, status, creattime, img1) VALUES({$typeid}, {$order_id}, 1, ".time().", '{$img_src}')");
                 }
             } catch (\Exception $e) {
                 $this->flashSession->error($e->getMessage());
