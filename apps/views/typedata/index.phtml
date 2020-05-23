@@ -100,9 +100,9 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
 <table class="table table-bordered text-left table-hover" style="table-layout: fixed; word-break: break-all;">
     <thead>
     <tr>
-        <?php if ($superAdmin):?>
-            <th width="64"><input type="checkbox" onclick="selectAll(this)"/>全选</th>
-        <?php endif;?>
+<!--        --><?php //if ($superAdmin):?>
+<!--            <th width="64"><input type="checkbox" onclick="selectAll(this)"/>全选</th>-->
+<!--        --><?php //endif;?>
         <th width="64">序号</th>
         <th width="64">项目id</th>
         <th width="80">项目名称</th>
@@ -124,17 +124,17 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
         <th width="150">IMSI</th>
         <th width="160">SIMID</th>
         <th width="64">提取</th>
-        <?php if ($superAdmin):?>
-            <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>
-        <?php endif;?>
+<!--        --><?php //if ($superAdmin):?>
+<!--            <th width="64"><button class="btn btn-sm btn-danger delete" onclick="moveTypedata('del');">删除</button></th>-->
+<!--        --><?php //endif;?>
     </tr>
     </thead>
     <tbody>
     <?php foreach ($page->items as $item): ?>
         <tr>
-            <?php if ($superAdmin):?>
-                <td><input type="checkbox" name="ids" value="<?= $item->id;?>"></td>
-            <?php endif;?>
+<!--            --><?php //if ($superAdmin):?>
+<!--                <td><input type="checkbox" name="ids" value="--><?//= $item->id;?><!--"></td>-->
+<!--            --><?php //endif;?>
             <td><?= $item->orderid;?></td>
             <td><?= $item->tid;?></td>
             <td><?= $typearrs[$item->tid];?></td>
@@ -156,9 +156,9 @@ $superAdmin = ($admin['id'] == 1 || $admin['id'] == 2);
             <td><?= $item->imsi;?></td>
             <td><?= $item->sim_id;?></td>
             <td><?= $item->status=='1'?'未提取':'已提取';?></td>
-            <?php if ($superAdmin):?>
-                <td><a href="<?= $this->url->get('typedata/moveTypedata?ids='.$item->id.'&type=del') ?>" class="btn btn-sm btn-danger delete">删除</a></td>
-            <?php endif;?>
+<!--            --><?php //if ($superAdmin):?>
+<!--                <td><a href="--><?//= $this->url->get('typedata/moveTypedata?ids='.$item->id.'&type=del') ?><!--" class="btn btn-sm btn-danger delete">删除</a></td>-->
+<!--            --><?php //endif;?>
         </tr>
     <?php endforeach; ?>
     </tbody>
