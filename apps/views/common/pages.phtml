@@ -38,7 +38,7 @@ $params['page'] = 1;
                         <?php  $params['page'] = $page->last; ?>
                         <li class="paginate_button"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">尾页</span> </a></li>
                     <?php endif;?>
-                    <li class="paginate_button"><span>总条数：<?=$total_items?></span</li>
+                    <li class="paginate_button"><span>第<?=$page->current?>页 共<?=$page->total_pages?>页 共<?=$total_items?>条</span</li>
                 </ul>
 
             </div>
