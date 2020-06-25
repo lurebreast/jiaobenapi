@@ -28,7 +28,6 @@ $params['page'] = 1;
                                 ?>
                                 <li class="paginate_button"><a href="<?= $fullurl ?>"><?= $i ?></a></li>
                                 <?php
-
                             }
                         }
 
@@ -37,8 +36,8 @@ $params['page'] = 1;
                         <li class="paginate_button next"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">&raquo;</span> </a></li>
                         <?php  $params['page'] = $page->last; ?>
                         <li class="paginate_button"><a href="<?= $this->url->get($url, $params) ?>"> <span aria-hidden="true">尾页</span> </a></li>
+                        <li class="paginate_button"><span>共<?=$total_items?>条记录 第<?=$page->current?>页 共<?=$page->total_pages?>页</span</li>
                     <?php endif;?>
-                    <li class="paginate_button"><span>第<?=$page->current?>页 共<?=$page->total_pages?>页 共<?=$total_items?>条</span</li>
                 </ul>
 
             </div>
